@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Андрей Болтачев](https://up.htmlacademy.ru/ecmascript/10/user/1070841).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Рубец](https://up.htmlacademy.ru/ecmascript/10/user/41580).
 
 ---
 
