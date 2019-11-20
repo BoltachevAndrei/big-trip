@@ -1,4 +1,4 @@
-`use strict`;
+'use strict';
 
 const TRIP_CARDS_COUNT = 3;
 
