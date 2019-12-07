@@ -2,25 +2,28 @@ import {createTripInfoTemplate} from './components/trip-info.js';
 import {createMenuTemplate} from './components/menu.js';
 import {createFiltersTemplate} from './components/filters.js';
 import {createTripSortTemplate} from './components/trip-sort.js';
-import {createAddEditTripTemplate} from './components/add-edit-trip.js';
+import {createAddEditEventTemplate} from './components/add-edit-event.js';
 import {createTripCardsBoardTemplate} from './components/board.js';
-import {createTripCardTemplate} from './components/trip-card.js';
+import {createTripDaysTemplate} from './components/trip-days.js';
+import {generateEvents} from './mock/events.js';
 
-const TRIP_CARDS_COUNT = 3;
+const sortEventsByDate = (events) => events.slice().sort((a, b) => a.startDate - b.startDate);
+
+const TRIP_EVENTS_COUNT = 10;
+
+const mockEvents = generateEvents(TRIP_EVENTS_COUNT);
+
+const sortedEvents = sortEventsByDate(mockEvents);
 
 const render = (container, element, position) => {
   container.insertAdjacentHTML(position, element);
 };
 
-const renderTripCards = (count) => {
-  for (let i = 0; i < count; i++) {
-    render(tripCardsContainer, createTripCardTemplate(), `beforeend`);
-  }
-};
+const renderTripDays = (events) => render(tripDaysContainer, createTripDaysTemplate(events), `beforeend`);
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 
-render(tripInfoContainer, createTripInfoTemplate(), `afterbegin`);
+render(tripInfoContainer, createTripInfoTemplate(sortedEvents), `afterbegin`);
 
 const menuContainer = document.querySelector(`.trip-controls h2:nth-of-type(1)`);
 
@@ -34,10 +37,10 @@ const tripEventsContainer = document.querySelector(`.trip-events`);
 
 render(tripEventsContainer, createTripSortTemplate(), `beforeend`);
 
-render(tripEventsContainer, createAddEditTripTemplate(), `beforeend`);
+render(tripEventsContainer, createAddEditEventTemplate(sortedEvents[0]), `beforeend`);
 
 render(tripEventsContainer, createTripCardsBoardTemplate(), `beforeend`);
 
-const tripCardsContainer = document.querySelector(`.trip-days`);
+const tripDaysContainer = document.querySelector(`.trip-days`);
 
-renderTripCards(TRIP_CARDS_COUNT);
+renderTripDays(sortedEvents.slice(1, TRIP_EVENTS_COUNT));
