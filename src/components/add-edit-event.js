@@ -1,5 +1,5 @@
 import {EVENT_TYPE_TO_ICON, OFFERS} from '../const.js';
-import {addLeadingZero} from '../utils.js';
+import {addLeadingZero, createElement} from '../utils.js';
 
 const createPhotosTemplate = (event) => (
   event.photos.map((element) => (
@@ -24,7 +24,7 @@ const createOffersTemplate = (event) => (
 
 const formatDate = (date) => `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth())}/${String(date.getFullYear()).slice(2, 4)} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
 
-export const createAddEditEventTemplate = (event) => {
+const createAddEditEventTemplate = (event) => {
   const photos = createPhotosTemplate(event);
   const offers = createOffersTemplate(event);
   return (
@@ -158,3 +158,25 @@ export const createAddEditEventTemplate = (event) => {
     </form>`
   );
 };
+
+export default class AddEditEvent {
+  constructor(event) {
+    this._element = null;
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createAddEditEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

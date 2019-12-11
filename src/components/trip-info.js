@@ -1,9 +1,9 @@
 import {MONTHS} from '../const.js';
-import {addLeadingZero} from '../utils.js';
+import {addLeadingZero, createElement} from '../utils.js';
 
 const formatDate = (date) => (date instanceof Date) ? `${date.getDate()} ${MONTHS[date.getMonth()]}` : ``;
 
-export const createTripInfoTemplate = (events) => {
+const createTripInfoTemplate = (events) => {
   const startDate = formatDate(events[0].startDate);
   const endDate = events[0].startDate.getMonth() === events[events.length - 1].endDate.getMonth() ? addLeadingZero(events[events.length - 1].endDate.getDate()) : formatDate(events[events.length - 1].endDate);
   const tripPrice = events.map((element) => element.price).reduce((previousValue, currentValue) => previousValue + currentValue);
@@ -16,3 +16,25 @@ export const createTripInfoTemplate = (events) => {
     </div>`
   );
 };
+
+export default class TripInfo {
+  constructor(events) {
+    this._element = null;
+    this._events = events;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._events);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
