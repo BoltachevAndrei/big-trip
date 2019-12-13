@@ -1,12 +1,12 @@
 import {createElement} from '../utils.js';
 
-export default class Board {
+export default class NoEvents {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return `<ul class="trip-days"></ul>`;
+    return `<p class="trip-events__msg">Click New Event to create your first point</p>`;
   }
 
   getElement() {
