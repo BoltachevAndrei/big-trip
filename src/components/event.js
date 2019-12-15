@@ -1,9 +1,13 @@
 import {EVENT_TYPE_TO_ICON} from "../const";
-import {addLeadingZero, createElement, formatDateToDateTime} from '../utils.js';
+import {addLeadingZero, formatDateToDateTime} from '../utils/common.js';
+import AbstractComponent from "./abstract-component";
 
 const formatDateToTime = (date) => `${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
 
 const formatDuration = (milliseconds) => {
+  if (milliseconds < 0) {
+    return `Внимание! Дата окончания события меньше даты начала события!`;
+  }
   const durationDays = Math.floor(milliseconds / (1000 * 60 * 60 * 24)) > 0 ? `${addLeadingZero(Math.floor(milliseconds / (1000 * 60 * 60 * 24)))}D` : ``;
   const durationHours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) > 0 ? `${addLeadingZero(Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)))}H` : ``;
   const durationMinutes = `${addLeadingZero(Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60)))}M`;
@@ -54,9 +58,9 @@ const createEventTemplate = (event) => (
   </li>`
 );
 
-export default class Event {
+export default class Event extends AbstractComponent {
   constructor(event) {
-    this._element = null;
+    super();
     this._event = event;
   }
 
@@ -64,14 +68,10 @@ export default class Event {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setRollupButtonClickHandler(handler) {
+    const eventRollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    eventRollupButton.addEventListener(`click`, () => {
+      handler();
+    });
   }
 }

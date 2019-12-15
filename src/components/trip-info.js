@@ -1,5 +1,6 @@
 import {MONTHS} from '../const.js';
-import {addLeadingZero, createElement} from '../utils.js';
+import {addLeadingZero} from '../utils/common.js';
+import AbstractComponent from './abstract-component.js';
 
 const formatDate = (date) => (date instanceof Date) ? `${date.getDate()} ${MONTHS[date.getMonth()]}` : ``;
 
@@ -17,24 +18,13 @@ const createTripInfoTemplate = (events) => {
   );
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractComponent {
   constructor(events) {
-    this._element = null;
+    super();
     this._events = events;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._events);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

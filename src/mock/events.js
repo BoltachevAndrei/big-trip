@@ -1,4 +1,4 @@
-import {getRandomElement, getRandomArray, generateRandomNumber, generatePhotos, generateRandomStartDate, generateRandomEndDate} from "../utils";
+import {getRandomElement, getRandomArray, generateRandomNumber, generatePhotos, generateRandomStartDate, generateRandomEndDate} from "../utils/common.js";
 import {OFFERS} from '../const.js';
 
 const TYPES = [
