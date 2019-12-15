@@ -54,7 +54,7 @@ export default class TripController {
   }
 
   render(events) {
-    const isNoEvents = events.length > 0 ? false : true;
+    const isNoEvents = events.length <= 0;
 
     if (isNoEvents) {
       render(this._container, this._noEvents, RenderPosition.AFTERBEGIN);
