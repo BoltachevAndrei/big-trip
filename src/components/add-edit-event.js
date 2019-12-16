@@ -1,5 +1,6 @@
 import {EVENT_TYPE_TO_ICON, OFFERS} from '../const.js';
-import {addLeadingZero, createElement} from '../utils.js';
+import {addLeadingZero} from '../utils/common.js';
+import AbstractComponent from './abstract-component.js';
 
 const createPhotosTemplate = (event) => (
   event.photos.map((element) => (
@@ -22,7 +23,7 @@ const createOffersTemplate = (event) => (
   .join(`\n`)
 );
 
-const formatDate = (date) => `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth())}/${String(date.getFullYear()).slice(2, 4)} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
+const formatDate = (date) => `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2, 4)} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
 
 const createAddEditEventTemplate = (event) => {
   const photos = createPhotosTemplate(event);
@@ -159,9 +160,9 @@ const createAddEditEventTemplate = (event) => {
   );
 };
 
-export default class AddEditEvent {
+export default class AddEditEvent extends AbstractComponent {
   constructor(event) {
-    this._element = null;
+    super();
     this._event = event;
   }
 
@@ -169,14 +170,7 @@ export default class AddEditEvent {
     return createAddEditEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }

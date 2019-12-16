@@ -1,10 +1,3 @@
-export const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
-  AFTER: `after`,
-  BEFORE: `before`
-};
-
 export const generateRandomNumber = (min, max) => (min + Math.round(Math.random() * (max - min)));
 
 export const getRandomElement = (array) => array[generateRandomNumber(0, [array.length - 1])];
@@ -40,25 +33,5 @@ export const generateRandomStartDate = (targetDate) => {
 };
 
 export const addLeadingZero = (value) => value < 10 ? `0${value}` : value;
-
-export const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-  return newElement.firstChild;
-};
-
-export const render = (container, element, position) => {
-  switch (position) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-    case RenderPosition.AFTER:
-      container.after(element);
-      break;
-  }
-};
 
 export const formatDateToDateTime = (date) => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${date.getHours()}:${date.getMinutes()}`;
