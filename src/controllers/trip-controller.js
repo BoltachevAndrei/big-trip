@@ -6,7 +6,7 @@ import Event from '../components/event.js';
 import NoEvents from '../components/no-events.js';
 import TripDays from '../components/trip-days';
 import TripInfo from '../components/trip-info.js';
-import TripSort from '../components/trip-sort.js';
+import TripSort, {SortType} from '../components/trip-sort.js';
 
 const renderEvent = (event, container) => {
   const newEvent = new Event(event);
@@ -30,6 +30,31 @@ const renderEvent = (event, container) => {
 
   render(container, newEvent, RenderPosition.BEFOREEND);
 };
+
+const renderEvents = (events, container, sortType) => {
+  container.innerHTML = ``;
+  const renderTripDay = (group, day) => {
+    const newDay = new TripDays(group, day);
+    render(container, newDay, RenderPosition.BEFOREEND);
+    return newDay;
+  };
+
+  if (sortType !== SortType.DEFAULT) {
+    const groupedEvents = events.slice();
+    const newDay = renderTripDay(groupedEvents, 0);
+    groupedEvents.forEach((element) => {
+      renderEvent(element, newDay.getElement().querySelector(`.trip-events__list`));
+    });
+  } else {
+    const sortedEvents = sortEventsByDate(events);
+    const groupedEvents = groupEventsByDate(sortedEvents);
+    groupedEvents.forEach((group, day) => {
+      const newDay = renderTripDay(group, day);
+      group.forEach((element) => renderEvent(element, newDay.getElement().querySelector(`.trip-events__list`)));
+    });
+  }
+};
+
 
 const groupEventsByDate = (events) => {
   const sortedEvents = sortEventsByDate(events);
@@ -55,30 +80,33 @@ export default class TripController {
 
   render(events) {
     const isNoEvents = events.length <= 0;
-
     if (isNoEvents) {
       render(this._container, this._noEvents, RenderPosition.AFTERBEGIN);
     } else {
-      const renderTripDay = (group, day) => {
-        const newDay = new TripDays(group, day);
-        render(tripDaysContainer, newDay, RenderPosition.BEFOREEND);
-        return newDay;
-      };
-
-      const sortedEvents = sortEventsByDate(events);
-      const groupedEvents = groupEventsByDate(sortedEvents);
-
       const tripInfoContainer = document.querySelector(`.trip-info`);
-      render(tripInfoContainer, new TripInfo(sortedEvents), RenderPosition.AFTERBEGIN);
-
+      render(tripInfoContainer, new TripInfo(events), RenderPosition.AFTERBEGIN);
       render(this._container, this._tripSort, RenderPosition.BEFOREEND);
       render(this._container, this._board, RenderPosition.BEFOREEND);
-
       const tripDaysContainer = document.querySelector(`.trip-days`);
-      groupedEvents.forEach((group, day) => {
-        const newDay = renderTripDay(group, day);
-        group.forEach((element) => renderEvent(element, newDay.getElement().querySelector(`.trip-events__list`)));
+
+      this._tripSort.setSortTypeClickHandler((sortType) => {
+        let sortedEvents = [];
+        switch (sortType) {
+          case SortType.DEFAULT:
+            sortedEvents = events.slice();
+            renderEvents(sortedEvents, tripDaysContainer, sortType);
+            break;
+          case SortType.DURATION:
+            sortedEvents = events.slice().sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate));
+            renderEvents(sortedEvents, tripDaysContainer, sortType);
+            break;
+          case SortType.PRICE:
+            sortedEvents = events.slice().sort((a, b) => b.price - a.price);
+            renderEvents(sortedEvents, tripDaysContainer, sortType);
+            break;
+        }
       });
+      renderEvents(events, tripDaysContainer, SortType.DEFAULT);
     }
   }
 }
