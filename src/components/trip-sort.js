@@ -1,3 +1,9 @@
+export const SortType = {
+  DEFAULT: `default`,
+  DURATION: `duration`,
+  PRICE: `price`
+};
+
 import AbstractComponent from './abstract-component.js';
 
 const createTripSortTemplate = () => (
@@ -5,12 +11,12 @@ const createTripSortTemplate = () => (
     <span class="trip-sort__item  trip-sort__item--day">Day</span>
 
     <div class="trip-sort__item  trip-sort__item--event">
-      <input id="sort-event" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-event" checked>
+    <input data-sort-type="default" id="sort-event" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-event" checked>
       <label class="trip-sort__btn" for="sort-event">Event</label>
     </div>
 
     <div class="trip-sort__item  trip-sort__item--time">
-      <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
+    <input data-sort-type="duration" id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
       <label class="trip-sort__btn" for="sort-time">
         Time
         <svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">
@@ -20,7 +26,7 @@ const createTripSortTemplate = () => (
     </div>
 
     <div class="trip-sort__item  trip-sort__item--price">
-      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+    <input data-sort-type="price" id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
       <label class="trip-sort__btn" for="sort-price">
         Price
         <svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">
@@ -34,7 +40,29 @@ const createTripSortTemplate = () => (
 );
 
 export default class TripSort extends AbstractComponent {
+  constructor() {
+    super();
+    this._currentSortType = SortType.DEFAULT;
+  }
+
   getTemplate() {
     return createTripSortTemplate();
+  }
+
+  setSortTypeClickHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.tagName !== `INPUT`) {
+        return;
+      }
+
+      if (evt.target.dataset.sortType === this._currentSortType) {
+        return;
+      }
+
+      const sortType = evt.target.dataset.sortType;
+      this._currentSortType = sortType;
+
+      handler(sortType);
+    });
   }
 }
