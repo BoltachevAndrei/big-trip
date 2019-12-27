@@ -2,7 +2,7 @@ import {getRandomElement, getRandomArray, generateRandomNumber, generatePhotos, 
 import {OFFERS} from '../const.js';
 
 const TYPES = [
-  `Check`,
+  `Check-in`,
   `Sightseeing`,
   `Restaurant`,
   `Taxi`,

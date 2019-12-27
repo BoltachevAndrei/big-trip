@@ -1,6 +1,6 @@
-import {EVENT_TYPE_TO_ICON, OFFERS} from '../const.js';
+import {DESTINATION_TO_DESCRIPTION, EVENT_TYPE_TO_ICON, OFFERS, EVENT_TYPE_TO_PLACEHOLDER} from '../const.js';
 import {addLeadingZero} from '../utils/common.js';
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createPhotosTemplate = (event) => (
   event.photos.map((element) => (
@@ -25,9 +25,11 @@ const createOffersTemplate = (event) => (
 
 const formatDate = (date) => `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2, 4)} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
 
-const createAddEditEventTemplate = (event) => {
+const createAddEditEventTemplate = (event, options) => {
+  const {destination, description} = options;
   const photos = createPhotosTemplate(event);
   const offers = createOffersTemplate(event);
+  const isFavorite = event.isFavorite ? `checked` : ``;
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
@@ -101,9 +103,9 @@ const createAddEditEventTemplate = (event) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${event.type}
+            ${event.type} ${EVENT_TYPE_TO_PLACEHOLDER[event.type]}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${event.destination}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
@@ -134,6 +136,18 @@ const createAddEditEventTemplate = (event) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+
+        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
+        <label class="event__favorite-btn" for="event-favorite-1">
+          <span class="visually-hidden">Add to favorite</span>
+          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"></path>
+          </svg>
+        </label>
+
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
       </header>
       <section class="event__details">
 
@@ -147,7 +161,7 @@ const createAddEditEventTemplate = (event) => {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${event.description}</p>
+          <p class="event__destination-description">${description}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
@@ -160,17 +174,67 @@ const createAddEditEventTemplate = (event) => {
   );
 };
 
-export default class AddEditEvent extends AbstractComponent {
+export default class AddEditEvent extends AbstractSmartComponent {
   constructor(event) {
     super();
     this._event = event;
+    this._destination = event.destination;
+    this._description = event.description;
+    this._favoriteButtonHanlder = null;
+    this._formSubmitHandler = null;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createAddEditEventTemplate(this._event);
+    return createAddEditEventTemplate(this._event, {destination: this._destination, description: this._description});
+  }
+
+  recoveryListeners() {
+    this.setFormSubmitHandler(this._formSubmitHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteButtonHanlder);
+    this._subscribeOnEvents();
+  }
+
+  reset() {
+    const event = this._event;
+    this._destination = event.destination;
+    this._description = event.description;
+    this.rerender();
   }
 
   setFormSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._formSubmitHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
+    this._favoriteButtonHanlder = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName.toLowerCase() === `label`) {
+        this._event.type = evt.target.innerHTML;
+        this.rerender();
+      }
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`click`, (evt) => {
+      if (evt.target.tagName.toLowerCase() === `input`) {
+        evt.target.value = ``;
+      }
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      if (evt.target.tagName.toLowerCase() === `input`) {
+        this._destination = evt.target.value;
+        this._description = DESTINATION_TO_DESCRIPTION[evt.target.value];
+        this.rerender();
+      }
+    });
   }
 }

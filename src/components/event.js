@@ -1,4 +1,4 @@
-import {EVENT_TYPE_TO_ICON} from "../const";
+import {EVENT_TYPE_TO_ICON, EVENT_TYPE_TO_PLACEHOLDER} from "../const";
 import {addLeadingZero, formatDateToDateTime} from '../utils/common.js';
 import AbstractComponent from "./abstract-component";
 
@@ -31,7 +31,7 @@ const createEventTemplate = (event) => (
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${EVENT_TYPE_TO_ICON[event.type]}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${event.type} ${event.destination}</h3>
+      <h3 class="event__title">${event.type} ${EVENT_TYPE_TO_PLACEHOLDER[event.type]} ${event.destination}</h3>
 
       <div class="event__schedule">
         <p class="event__time">
