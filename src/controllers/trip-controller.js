@@ -79,7 +79,7 @@ export default class TripController {
     }
 
     const tripInfoContainer = document.querySelector(`.trip-info`);
-    render(tripInfoContainer, new TripInfo(this._events), RenderPosition.AFTERBEGIN);
+    render(tripInfoContainer, new TripInfo(sortEventsByDate(this._events)), RenderPosition.AFTERBEGIN);
     render(this._container, this._tripSortComponent, RenderPosition.BEFOREEND);
     render(this._container, this._boardComponent, RenderPosition.BEFOREEND);
     const tripDaysContainer = document.querySelector(`.trip-days`);

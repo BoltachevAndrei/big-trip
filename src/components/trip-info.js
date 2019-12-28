@@ -1,12 +1,9 @@
-import {MONTHS} from '../const.js';
-import {addLeadingZero} from '../utils/common.js';
+import {formatDate, formatDay} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
-
-const formatDate = (date) => (date instanceof Date) ? `${date.getDate()} ${MONTHS[date.getMonth()]}` : ``;
 
 const createTripInfoTemplate = (events) => {
   const startDate = formatDate(events[0].startDate);
-  const endDate = events[0].startDate.getMonth() === events[events.length - 1].endDate.getMonth() ? addLeadingZero(events[events.length - 1].endDate.getDate()) : formatDate(events[events.length - 1].endDate);
+  const endDate = events[0].startDate.getMonth() === events[events.length - 1].endDate.getMonth() ? formatDay(events[events.length - 1].endDate) : formatDate(events[events.length - 1].endDate);
   const tripPrice = events.map((element) => element.price).reduce((previousValue, currentValue) => previousValue + currentValue);
   const tripPriceContainer = document.querySelector(`.trip-info__cost-value`);
   tripPriceContainer.innerHTML = tripPrice;
