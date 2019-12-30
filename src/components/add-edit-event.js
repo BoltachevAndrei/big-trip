@@ -1,5 +1,5 @@
+import flatpickr from 'flatpickr';
 import {DESTINATION_TO_DESCRIPTION, EVENT_TYPE_TO_ICON, OFFERS, EVENT_TYPE_TO_PLACEHOLDER} from '../const.js';
-import {addLeadingZero} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createPhotosTemplate = (event) => (
@@ -22,8 +22,6 @@ const createOffersTemplate = (event) => (
   )
   .join(`\n`)
 );
-
-const formatDate = (date) => `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth() + 1)}/${String(date.getFullYear()).slice(2, 4)} ${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
 
 const createAddEditEventTemplate = (event, options) => {
   const {destination, description} = options;
@@ -118,12 +116,12 @@ const createAddEditEventTemplate = (event, options) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(event.startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="">
           —
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(event.endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -182,7 +180,10 @@ export default class AddEditEvent extends AbstractSmartComponent {
     this._description = event.description;
     this._favoriteButtonHanlder = null;
     this._formSubmitHandler = null;
+    this._flatpickrStartDate = null;
+    this._flatpickrEndDate = null;
 
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -194,6 +195,12 @@ export default class AddEditEvent extends AbstractSmartComponent {
     this.setFormSubmitHandler(this._formSubmitHandler);
     this.setFavoriteButtonClickHandler(this._favoriteButtonHanlder);
     this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -211,6 +218,36 @@ export default class AddEditEvent extends AbstractSmartComponent {
   setFavoriteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
     this._favoriteButtonHanlder = handler;
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickrStartDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrStartDate = null;
+    }
+    if (this._flatpickrEndDate) {
+      this._flatpickrEndDate.destroy();
+      this._flatpickrEndDate = null;
+    }
+
+    const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
+    this._flatpickrStartDate = flatpickr(startDateElement, {
+      altInput: true,
+      allowInput: true,
+      enableTime: true,
+      defaultDate: this._event.startDate,
+      dateFormat: `d/m/y H:i`,
+      altFormat: `d/m/y H:i`
+    });
+
+    const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._flatpickrEndDate = flatpickr(endDateElement, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: this._event.endDate,
+      dateFormat: `d/m/y H:i`,
+      altFormat: `d/m/y H:i`
+    });
   }
 
   _subscribeOnEvents() {

@@ -1,16 +1,14 @@
 import {EVENT_TYPE_TO_ICON, EVENT_TYPE_TO_PLACEHOLDER} from "../const";
-import {addLeadingZero, formatDateToDateTime} from '../utils/common.js';
+import {formatTime, formatDay, formatHour, formatMinute} from '../utils/common.js';
 import AbstractComponent from "./abstract-component";
 
-const formatDateToTime = (date) => `${addLeadingZero(date.getHours())}:${addLeadingZero(date.getMinutes())}`;
-
-const formatDuration = (milliseconds) => {
-  if (milliseconds < 0) {
+const formatDuration = (startDate, endDate) => {
+  if (endDate - startDate < 0) {
     return `Внимание! Дата окончания события меньше даты начала события!`;
   }
-  const durationDays = Math.floor(milliseconds / (1000 * 60 * 60 * 24)) > 0 ? `${addLeadingZero(Math.floor(milliseconds / (1000 * 60 * 60 * 24)))}D` : ``;
-  const durationHours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) > 0 ? `${addLeadingZero(Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)))}H` : ``;
-  const durationMinutes = `${addLeadingZero(Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60)))}M`;
+  const durationDays = formatDay(endDate - startDate) > 0 ? `${formatDay(endDate - startDate)}D` : ``;
+  const durationHours = formatHour(endDate - startDate) > 0 ? `${formatHour(endDate - startDate)}H` : ``;
+  const durationMinutes = formatMinute(endDate - startDate) > 0 ? `${formatMinute(endDate - startDate)}M` : ``;
   return `${durationDays} ${durationHours} ${durationMinutes}`;
 };
 
@@ -35,11 +33,11 @@ const createEventTemplate = (event) => (
 
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${formatDateToDateTime(event.startDate)}">${formatDateToTime(event.startDate)}</time>
+          <time class="event__start-time" datetime="${event.startDate}">${formatTime(event.startDate)}</time>
           —
-          <time class="event__end-time" datetime="${formatDateToDateTime(event.endDate)}">${formatDateToTime(event.endDate)}</time>
+          <time class="event__end-time" datetime="${event.endDate}">${formatTime(event.endDate)}</time>
         </p>
-        <p class="event__duration">${formatDuration(event.endDate - event.startDate)}</p>
+        <p class="event__duration">${formatDuration(event.startDate, event.endDate)}</p>
       </div>
 
       <p class="event__price">

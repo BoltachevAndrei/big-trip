@@ -1,4 +1,3 @@
-import {getRandomElement, getRandomArray, generateRandomNumber, generatePhotos, generateRandomStartDate, generateRandomEndDate} from "../utils/common.js";
 import {OFFERS} from '../const.js';
 
 const TYPES = [
@@ -47,6 +46,40 @@ const EVENT_PRICE = {
 const PHOTOS_COUNT = {
   min: 0,
   max: 5
+};
+
+const generateRandomNumber = (min, max) => (min + Math.round(Math.random() * (max - min)));
+
+const getRandomElement = (array) => array[generateRandomNumber(0, [array.length - 1])];
+
+const generateRandomBoolean = () => Math.random() > 0.5;
+
+const getRandomArray = (array, size = array.length) => array.slice().filter(() => generateRandomBoolean()).slice(0, generateRandomNumber(1, size));
+
+const generatePhotos = (minSize, maxSize) => {
+  const length = generateRandomNumber(minSize, maxSize);
+  const result = new Array(length);
+  for (let i = 0; i < length; i++) {
+    result[i] = `http://picsum.photos/300/150?r=${Math.random()}`;
+  }
+  return result;
+};
+
+const generateRandomEndDate = (targetDate) => {
+  const newMinutes = generateRandomNumber(0, (60 * 48));
+  targetDate.setMinutes(newMinutes);
+  return targetDate;
+};
+
+const generateRandomStartDate = (targetDate) => {
+  const sign = Math.random() > 0.5 ? 1 : -1;
+  const diffValue = sign * generateRandomNumber(0, 7);
+  const newHours = generateRandomNumber(0, 23);
+  const newMinutes = generateRandomNumber(0, 59);
+  targetDate.setDate(targetDate.getDate() + diffValue);
+  targetDate.setHours(newHours);
+  targetDate.setMinutes(newMinutes);
+  return targetDate;
 };
 
 export const generateEvent = () => {
