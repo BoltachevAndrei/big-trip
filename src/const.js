@@ -48,28 +48,29 @@ export const MONTHS = [
 
 export const OFFERS = [
   {
-    type: `Add`,
-    title: `luggage`,
+    title: `Add luggage`,
     price: `30`
   },
   {
-    type: `Switch to`,
-    title: `comfort class`,
+    title: `Switch to comfort class`,
     price: `100`
   },
   {
-    type: `Add`,
-    title: `meal`,
+    title: `Add meal`,
     price: `15`
   },
   {
-    type: `Choose`,
-    title: `seats`,
+    title: `Choose seats`,
     price: `5`
   },
   {
-    type: `Travel by`,
-    title: `train`,
+    title: `Travel by train`,
     price: `40`
   }
 ];
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};

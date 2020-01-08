@@ -6,16 +6,16 @@ const formatDuration = (startDate, endDate) => {
   if (endDate - startDate < 0) {
     return `Внимание! Дата окончания события меньше даты начала события!`;
   }
-  const durationDays = formatDay(endDate - startDate) > 0 ? `${formatDay(endDate - startDate)}D` : ``;
-  const durationHours = formatHour(endDate - startDate) > 0 ? `${formatHour(endDate - startDate)}H` : ``;
-  const durationMinutes = formatMinute(endDate - startDate) > 0 ? `${formatMinute(endDate - startDate)}M` : ``;
+  const durationDays = formatDay(startDate, endDate) > 0 ? `${formatDay(startDate, endDate)}D` : ``;
+  const durationHours = formatHour(startDate, endDate) > 0 || formatDay(startDate, endDate) > 0 ? `${formatHour(startDate, endDate)}H` : ``;
+  const durationMinutes = formatHour(startDate, endDate) > 0 || formatDay(startDate, endDate) > 0 || formatMinute(startDate, endDate) > 0 ? `${formatMinute(startDate, endDate)}M` : ``;
   return `${durationDays} ${durationHours} ${durationMinutes}`;
 };
 
-const createOffersTemplate = (offers) => (
-  offers.slice(0, 2).map((element) => (
+const createOffersTemplate = (event) => (
+  event.offers.slice(0, 2).map((element) => (
     `<li class="event__offer">
-      <span class="event__offer-title">${element.type} ${element.title}</span>
+      <span class="event__offer-title">${element.title}</span>
         +
       €&nbsp;<span class="event__offer-price">${element.price}</span>
     </li>`)
@@ -29,7 +29,7 @@ const createEventTemplate = (event) => (
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${EVENT_TYPE_TO_ICON[event.type]}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${event.type} ${EVENT_TYPE_TO_PLACEHOLDER[event.type]} ${event.destination}</h3>
+      <h3 class="event__title">${event.type} ${EVENT_TYPE_TO_PLACEHOLDER[event.type]} ${event.destination.name}</h3>
 
       <div class="event__schedule">
         <p class="event__time">
@@ -46,7 +46,7 @@ const createEventTemplate = (event) => (
 
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${createOffersTemplate(event.offers)}
+        ${createOffersTemplate(event)}
       </ul>
 
       <button class="event__rollup-btn" type="button">
