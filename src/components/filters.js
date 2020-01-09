@@ -1,28 +1,43 @@
 import AbstractComponent from './abstract-component.js';
+import {FilterType} from '../const.js';
 
-const createFiltersTemplate = () => (
-  `<form class="trip-filters" action="#" method="get">
-    <div class="trip-filters__filter">
-      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked="">
-      <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-    </div>
+const FILTER_ID_PREFIX = `filter-`;
 
-    <div class="trip-filters__filter">
-      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-      <label class="trip-filters__filter-label" for="filter-future">Future</label>
-    </div>
+const getFilterNameById = (id) => id.substring(FILTER_ID_PREFIX.length);
 
-    <div class="trip-filters__filter">
-      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past">
-      <label class="trip-filters__filter-label" for="filter-past">Past</label>
-    </div>
-
-    <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>`
+const createFiltersTemplate = (filterType) => (
+  Object.values(FilterType).map((element) =>
+    `<div class="trip-filters__filter">
+      <input id="filter-${element}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${element}" ${element === filterType ? `checked` : ``}>
+      <label class="trip-filters__filter-label" for="filter-${element}">${element}</label>
+    </div>`)
+  .join(`\n`)
 );
 
+const createFiltersContainerTemplate = (filterType) => {
+  const filters = createFiltersTemplate(filterType);
+  return (
+    `<form class="trip-filters" action="#" method="get">
+      ${filters}
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>`
+  );
+};
+
 export default class Filters extends AbstractComponent {
+  constructor(filterType) {
+    super();
+    this._activeFilterType = filterType;
+  }
+
   getTemplate() {
-    return createFiltersTemplate();
+    return createFiltersContainerTemplate(this._activeFilterType);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = getFilterNameById(evt.target.id);
+      handler(filterName);
+    });
   }
 }

@@ -1,4 +1,4 @@
-import {OFFERS} from '../const.js';
+import {DESTINATION_TO_DESCRIPTION, OFFERS} from '../const.js';
 
 const TYPES = [
   `Check-in`,
@@ -16,26 +16,13 @@ const TYPES = [
 const DESTINATIONS = [
   `Amsterdam`,
   `Geneva`,
-  `Chamonix`
-];
-
-const DESCRIPTIONS = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-  `Aliquam erat volutpat.`,
-  `Nunc fermentum tortor ac porta dapibus.`,
-  `In rutrum ac purus sit amet tempus.`
+  `Chamonix`,
+  `Saint Petersburg`
 ];
 
 const OFFERS_COUNT = {
   min: 0,
-  max: 2
+  max: 5
 };
 
 const EVENT_PRICE = {
@@ -82,32 +69,64 @@ const generateRandomStartDate = (targetDate) => {
   return targetDate;
 };
 
-export const generateEvent = () => {
+const generateDestinations = () => {
+  return DESTINATIONS.map((element) => {
+    const description = DESTINATION_TO_DESCRIPTION[element];
+    const name = element;
+    const picturesSrc = generatePhotos(PHOTOS_COUNT.min, PHOTOS_COUNT.max);
+    const pictures = picturesSrc.map((picture) => {
+      return {
+        src: picture,
+        description: getRandomElement(description)
+      };
+    });
+    return {
+      description,
+      name,
+      pictures
+    };
+  });
+};
+
+export const generateOffers = () => {
+  return TYPES.map((element) => {
+    const type = element;
+    const offers = getRandomArray(OFFERS, generateRandomNumber(OFFERS_COUNT.min, OFFERS_COUNT.max));
+    return {
+      type,
+      offers
+    };
+  });
+};
+
+export const generateEvent = (generatedDestinations, allOffers) => {
+  const id = String(new Date() + Math.random());
   const type = getRandomElement(TYPES);
-  const destination = getRandomElement(DESTINATIONS);
-  const description = getRandomArray(DESCRIPTIONS, 3);
-  const offers = getRandomArray(OFFERS, generateRandomNumber(OFFERS_COUNT.min, OFFERS_COUNT.max));
+  const destination = getRandomElement(generatedDestinations);
   const price = generateRandomNumber(EVENT_PRICE.min, EVENT_PRICE.max);
   const startDate = generateRandomStartDate(new Date());
   const endDate = generateRandomEndDate(new Date(startDate));
-  const photos = generatePhotos(PHOTOS_COUNT.min, PHOTOS_COUNT.max);
+  const isFavorite = generateRandomBoolean();
+  const index = allOffers.findIndex((element) => element.type === type);
+  const offers = getRandomArray(allOffers[index].offers);
 
   return {
-    type,
-    destination,
-    description,
-    offers,
     price,
     startDate,
     endDate,
-    photos
+    destination,
+    id,
+    isFavorite,
+    offers,
+    type
   };
 };
 
-export const generateEvents = (count) => {
+export const generateEvents = (count, allOffers) => {
+  const destinations = generateDestinations();
   const events = new Array(count);
   for (let i = 0; i < count; i++) {
-    events[i] = generateEvent();
+    events[i] = generateEvent(destinations, allOffers);
   }
   return events;
 };

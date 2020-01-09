@@ -1,11 +1,13 @@
-import moment from 'moment';
+export const formatDay = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).days();
 
-export const formatDay = (date) => moment(date).format(`DD`);
+export const formatHour = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).hours();
 
-export const formatHour = (date) => moment(date).format(`HH`);
+export const formatMinute = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).minutes();
 
-export const formatMinute = (date) => moment(date).format(`mm`);
+export const formatTime = (date) => window.moment(date).format(`HH:mm`);
 
-export const formatTime = (date) => moment(date).format(`hh:mm`);
+export const formatDate = (date) => window.moment(date).format(`DD MMM`);
 
-export const formatDate = (date) => moment(date).format(`DD MMM`);
+export const isFutureDate = (date) => date > new Date();
+
+export const isPastDate = (date) => date < new Date();
