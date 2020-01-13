@@ -1,3 +1,5 @@
+export const HIDDEN_CLASS = `visually-hidden`;
+
 export const EVENT_TYPE_TO_ICON = {
   'Taxi': `img/icons/taxi.png`,
   'Bus': `img/icons/bus.png`,

@@ -4,7 +4,9 @@ import AbstractComponent from './abstract-component.js';
 const createTripInfoTemplate = (events) => {
   const startDate = formatDate(events[0].startDate);
   const endDate = events[0].startDate.getMonth() === events[events.length - 1].endDate.getMonth() ? formatDay(events[0].startDate, events[events.length - 1].endDate) : formatDate(events[events.length - 1].endDate);
-  const tripPrice = events.map((element) => element.price).reduce((previousValue, currentValue) => previousValue + currentValue);
+  const offersPrice = events.map((element) => element.offers.map((offer) => offer.price)).reduce((a, b) => a.concat(b)).reduce((a, b) => Number.parseInt(a, 10) + Number.parseInt(b, 10));
+  const basePrice = events.map((element) => element.price).reduce((previousValue, currentValue) => previousValue + currentValue);
+  const tripPrice = basePrice + offersPrice;
   const tripPriceContainer = document.querySelector(`.trip-info__cost-value`);
   tripPriceContainer.innerHTML = tripPrice;
   return (
