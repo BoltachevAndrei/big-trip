@@ -1,8 +1,8 @@
-export const formatDay = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).days();
+export const formatDay = (duration) => window.moment.duration(duration).days();
 
-export const formatHour = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).hours();
+export const formatHour = (duration) => window.moment.duration(duration).hours();
 
-export const formatMinute = (startDate, endDate) => window.moment.duration(window.moment(endDate).diff(window.moment(startDate))).minutes();
+export const formatMinute = (duration) => window.moment.duration(duration).minutes();
 
 export const formatTime = (date) => window.moment(date).format(`HH:mm`);
 

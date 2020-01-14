@@ -2,18 +2,20 @@ import {EVENT_TYPE_TO_ICON, EVENT_TYPE_TO_PLACEHOLDER} from "../const";
 import {formatTime, formatDay, formatHour, formatMinute} from '../utils/common.js';
 import AbstractComponent from "./abstract-component";
 
-const formatDuration = (startDate, endDate) => {
-  if (endDate - startDate < 0) {
+const OFFERS_SHOW_LIMIT = 2;
+
+const formatDuration = (duration) => {
+  if (duration < 0) {
     return `Внимание! Дата окончания события меньше даты начала события!`;
   }
-  const durationDays = formatDay(startDate, endDate) > 0 ? `${formatDay(startDate, endDate)}D` : ``;
-  const durationHours = formatHour(startDate, endDate) > 0 || formatDay(startDate, endDate) > 0 ? `${formatHour(startDate, endDate)}H` : ``;
-  const durationMinutes = formatHour(startDate, endDate) > 0 || formatDay(startDate, endDate) > 0 || formatMinute(startDate, endDate) > 0 ? `${formatMinute(startDate, endDate)}M` : ``;
+  const durationDays = formatDay(duration) > 0 ? `${formatDay(duration)}D` : ``;
+  const durationHours = formatHour(duration) > 0 || formatDay(duration) > 0 ? `${formatHour(duration)}H` : ``;
+  const durationMinutes = formatHour(duration) > 0 || formatDay(duration) > 0 || formatMinute(duration) > 0 ? `${formatMinute(duration)}M` : ``;
   return `${durationDays} ${durationHours} ${durationMinutes}`;
 };
 
 const createOffersTemplate = (event) => (
-  event.offers.slice(0, 2).map((element) => (
+  event.offers.slice(0, OFFERS_SHOW_LIMIT).map((element) => (
     `<li class="event__offer">
       <span class="event__offer-title">${element.title}</span>
         +
@@ -37,7 +39,7 @@ const createEventTemplate = (event) => (
           —
           <time class="event__end-time" datetime="${event.endDate}">${formatTime(event.endDate)}</time>
         </p>
-        <p class="event__duration">${formatDuration(event.startDate, event.endDate)}</p>
+        <p class="event__duration">${formatDuration(event.endDate - event.startDate)}</p>
       </div>
 
       <p class="event__price">

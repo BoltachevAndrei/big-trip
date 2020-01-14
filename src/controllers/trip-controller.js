@@ -1,4 +1,5 @@
 import {render, RenderPosition} from '../utils/render.js';
+import {HIDDEN_CLASS} from '../const.js';
 
 import Board from '../components/board.js';
 import NoEvents from '../components/no-events.js';
@@ -73,6 +74,18 @@ export default class TripController {
 
     this._tripSortComponent.setSortTypeClickHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  hide() {
+    if (this._container) {
+      this._container.classList.add(HIDDEN_CLASS);
+    }
+  }
+
+  show() {
+    if (this._container) {
+      this._container.classList.remove(HIDDEN_CLASS);
+    }
   }
 
   render() {
