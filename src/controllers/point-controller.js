@@ -1,7 +1,8 @@
-import AddEditEvent from '../components/add-edit-event.js';
-import Event from '../components/event.js';
+import AddEditPoint from '../components/add-edit-point.js';
+import Point from '../components/point.js';
+import PointModel from '../models/point-model.js';
 import {remove, render, replace, RenderPosition} from '../utils/render.js';
-import {EVENT_TYPE_TO_PLACEHOLDER, DESTINATION_TO_DESCRIPTION} from '../const.js';
+import {TYPE_TO_PLACEHOLDER} from '../const.js';
 
 export const Mode = {
   ADD: `add`,
@@ -9,105 +10,138 @@ export const Mode = {
   VIEW: `view`
 };
 
+const getType = (rawType) => {
+  const keys = Object.keys(TYPE_TO_PLACEHOLDER);
+  const index = keys.findIndex((element) => rawType.toLowerCase().startsWith(element));
+  const type = keys[index];
+  return type;
+};
+
+const parseFormData = (formData, generatedOffers) => {
+  const type = getType(document.querySelector(`.event__type-output`).innerText);
+  const offerNamePrefix = `event-offer-`;
+  const offersForType = generatedOffers.filter((element) => element.type === type)[0].offers;
+  const offers = offersForType.filter((element) => formData.get(`${offerNamePrefix}${element.title}`) === `on`);
+  return new PointModel({
+    'base_price': Number.parseInt(formData.get(`event-price`), 10),
+    'date_from': new Date(formData.get(`event-start-time`)),
+    'date_to': new Date(formData.get(`event-end-time`)),
+    'destination': {
+      name: formData.get(`event-destination`),
+      description: document.querySelector(`.event__destination-description`).innerText,
+      pictures: []
+    },
+    'id': String(new Date() + Math.random()),
+    'is_favorite': formData.get(`event-favorite`),
+    'offers': offers,
+    'type': type
+  });
+};
+
 const getFirstKey = (object) => Object.keys(object)[0];
 
-const getFirstValue = (object) => Object.values(object)[0];
-
-export const EmptyEvent = {
-  type: getFirstKey(EVENT_TYPE_TO_PLACEHOLDER),
-  destination: {
-    name: getFirstKey(DESTINATION_TO_DESCRIPTION),
-    description: getFirstValue(DESTINATION_TO_DESCRIPTION),
-    pictures: []
-  },
-  offers: [],
-  price: ``,
+export const EmptyPoint = {
+  type: getFirstKey(TYPE_TO_PLACEHOLDER),
   startDate: null,
   endDate: null,
+  destination: {
+    pictures: []
+  },
+  price: ``,
+  isFavorite: false,
+  offers: []
 };
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange, offers) {
+  constructor(container, onDataChange, onViewChange, offers, destinations) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
 
     this._offers = offers;
+    this._destinations = destinations;
 
     this._mode = Mode.VIEW;
 
-    this._eventComponent = null;
-    this._addEditEventComponent = null;
+    this._pointComponent = null;
+    this._addEditPointComponent = null;
 
     this._onEscKeydown = this._onEscKeydown.bind(this);
   }
 
-  render(event, mode) {
-    const oldEventComponent = this._eventComponent;
-    const oldAddEditEventComponent = this._addEditEventComponent;
+  render(point, mode) {
+    const oldPointComponent = this._pointComponent;
+    const oldAddEditPointComponent = this._addEditPointComponent;
     this._mode = mode;
 
-    this._eventComponent = new Event(event);
-    this._addEditEventComponent = new AddEditEvent(event, this._offers);
+    this._pointComponent = new Point(point);
+    this._addEditPointComponent = new AddEditPoint(point, this._offers, this._destinations);
 
-    this._eventComponent.setRollupButtonClickHandler(() => {
-      this._replaceEventToAddEdit();
+    this._pointComponent.setRollupButtonClickHandler(() => {
+      this._replacePointToAddEdit();
       document.addEventListener(`keydown`, this._onEscKeydown);
     });
 
-    this._addEditEventComponent.setFavoriteButtonClickHandler(() => this._onDataChange(this, event, Object.assign({}, event, {isFavorite: !event.isFavorite})));
-
-    this._addEditEventComponent.setFormSubmitHandler((evt) => {
-      evt.preventDefault();
-      const data = this._addEditEventComponent.getFormData();
-      this._onDataChange(this, event, data);
+    this._addEditPointComponent.setFavoriteButtonClickHandler(() => {
+      const newPoint = PointModel.clone(point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, point, newPoint);
     });
 
-    this._addEditEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+    this._addEditPointComponent.setFormSubmitHandler((evt) => {
+      evt.preventDefault();
+      const formData = this._addEditPointComponent.getFormData();
+      const data = parseFormData(formData, this._offers);
+      this._onDataChange(this, point, data);
+    });
+
+    this._addEditPointComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
 
     switch (mode) {
       case Mode.VIEW:
-        if (oldEventComponent && oldAddEditEventComponent) {
-          replace(this._eventComponent, oldEventComponent);
-          replace(this._addEditEventComponent, oldAddEditEventComponent);
-          this._replaceAddEditToEvent();
+        if (oldPointComponent && oldAddEditPointComponent) {
+          replace(this._pointComponent, oldPointComponent);
+          replace(this._addEditPointComponent, oldAddEditPointComponent);
+          this._replaceAddEditToPoint();
         } else {
-          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+          render(this._container, this._pointComponent, RenderPosition.BEFOREEND);
         }
         break;
       case Mode.ADD:
-        if (oldEventComponent && oldAddEditEventComponent) {
-          remove(oldEventComponent);
-          remove(oldAddEditEventComponent);
+        if (oldPointComponent && oldAddEditPointComponent) {
+          remove(oldPointComponent);
+          remove(oldAddEditPointComponent);
         }
         document.addEventListener(`keydown`, this._onEscKeydown);
-        render(this._container, this._addEditEventComponent, RenderPosition.AFTERBEGIN);
+        render(this._container, this._addEditPointComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
 
   setDefaultView() {
     if (this._mode !== Mode.VIEW) {
-      this._replaceAddEditToEvent();
+      this._replaceAddEditToPoint();
     }
   }
 
   destroy() {
-    remove(this._eventComponent);
-    remove(this._addEditEventComponent);
+    remove(this._pointComponent);
+    remove(this._addEditPointComponent);
     document.removeEventListener(`keydown`, this._onEscKeydown);
   }
 
-  _replaceAddEditToEvent() {
+  _replaceAddEditToPoint() {
     document.removeEventListener(`keydown`, this._onEscKeydown);
-    this._addEditEventComponent.reset();
-    replace(this._eventComponent, this._addEditEventComponent);
+    this._addEditPointComponent.reset();
+    if (document.contains(this._addEditPointComponent.getElement())) {
+      replace(this._pointComponent, this._addEditPointComponent);
+    }
     this._mode = Mode.VIEW;
   }
 
-  _replaceEventToAddEdit() {
+  _replacePointToAddEdit() {
     this._onViewChange();
-    replace(this._addEditEventComponent, this._eventComponent);
+    replace(this._addEditPointComponent, this._pointComponent);
     this._mode = Mode.EDIT;
   }
 
@@ -115,9 +149,9 @@ export default class PointController {
     const isEscKeydown = evt.key === `Esc` || evt.key === `Escape`;
     if (isEscKeydown) {
       if (this._mode === Mode.ADD) {
-        this._onDataChange(this, EmptyEvent, null);
+        this._onDataChange(this, EmptyPoint, null);
       }
-      this._replaceAddEditToEvent();
+      this._replaceAddEditToPoint();
     }
   }
 }

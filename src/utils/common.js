@@ -1,8 +1,12 @@
-export const formatDay = (duration) => window.moment.duration(duration).days();
+export const capitalizeString = (string) => string.split(`-`).map((element) => element[0].toUpperCase().concat(element.slice(1))).join(`-`);
 
-export const formatHour = (duration) => window.moment.duration(duration).hours();
+export const getDurationDays = (duration) => window.moment.duration(duration).days();
 
-export const formatMinute = (duration) => window.moment.duration(duration).minutes();
+export const getDurationHours = (duration) => window.moment.duration(duration).hours();
+
+export const getDurationMinutes = (duration) => window.moment.duration(duration).minutes();
+
+export const formatDay = (date) => window.moment(date).format(`DD`);
 
 export const formatTime = (date) => window.moment(date).format(`HH:mm`);
 
