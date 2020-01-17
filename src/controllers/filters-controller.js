@@ -19,7 +19,7 @@ export default class FiltersController {
     this._filtersComponent = new Filters(this._activeFilterType);
     this._filtersComponent.setFilterChangeHandler(this._onFilterChange);
     if (oldFiltersComponent) {
-      replace(oldFiltersComponent, this._filtersComponent);
+      replace(this._filtersComponent, oldFiltersComponent);
     } else {
       render(container, this._filtersComponent, RenderPosition.AFTER);
     }

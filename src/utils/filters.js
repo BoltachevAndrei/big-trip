@@ -1,16 +1,16 @@
 import {isFutureDate, isPastDate} from '../utils/common.js';
 import {FilterType} from '../const.js';
 
-export const getFutureEvents = (events) => events.filter((element) => isFutureDate(element.endDate));
+export const getFuturePoints = (points) => points.filter((element) => isFutureDate(element.endDate));
 
-export const getPastEvents = (events) => events.filter((element) => isPastDate(element.endDate));
+export const getPastPoints = (points) => points.filter((element) => isPastDate(element.endDate));
 
-export const getEventsByFilter = (events, filterType) => {
+export const getPointsByFilter = (points, filterType) => {
   switch (filterType) {
     case FilterType.PAST:
-      return getPastEvents(events);
+      return getPastPoints(points);
     case FilterType.FUTURE:
-      return getFutureEvents(events);
+      return getFuturePoints(points);
   }
-  return events;
+  return points;
 };

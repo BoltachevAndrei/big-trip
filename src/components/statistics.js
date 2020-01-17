@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component';
-import {formatDay, formatHour} from '../utils/common.js';
+import {capitalizeString, getDurationHours, getDurationDays} from '../utils/common.js';
 
 const EURO_SIGN = `\u20AC`;
 
@@ -8,16 +8,16 @@ const createRandomColor = () => {
   return `#${colorValue.toString(16)}`;
 };
 
-const getUniqueItems = (events, key) => Array.from(new Set(events.map((element) => element[key])));
+const getUniqueItems = (points, key) => Array.from(new Set(points.map((element) => element[key])));
 
-const renderMoneyChart = (moneyCtx, events) => {
-  const uniqueTypes = getUniqueItems(events, `type`);
+const renderMoneyChart = (moneyCtx, points) => {
+  const uniqueTypes = getUniqueItems(points, `type`);
 
   const moneyByType = uniqueTypes.map((type) => {
     return ({type,
-      price: events
-    .filter((event) => event.type === type)
-    .map((event) => event.price)
+      price: points
+    .filter((point) => point.type === type)
+    .map((point) => point.basePrice)
     });
   }).map((element) => {
     return ({
@@ -30,7 +30,7 @@ const renderMoneyChart = (moneyCtx, events) => {
     plugins: [window.ChartDataLabels],
     type: `pie`,
     data: {
-      labels: moneyByType.map((element) => element.type),
+      labels: moneyByType.map((element) => capitalizeString(element.type)),
       datasets: [{
         data: moneyByType.map((element) => element.price),
         backgroundColor: moneyByType.map(createRandomColor)
@@ -81,13 +81,13 @@ const renderMoneyChart = (moneyCtx, events) => {
   });
 };
 
-const renderTransportChart = (transportCtx, events) => {
-  const uniqueTypes = getUniqueItems(events, `type`);
+const renderTransportChart = (transportCtx, points) => {
+  const uniqueTypes = getUniqueItems(points, `type`);
 
   const transportCount = uniqueTypes.map((type) => {
     return ({type,
-      count: events
-    .filter((event) => event.type === type).length
+      count: points
+    .filter((point) => point.type === type).length
     });
   });
 
@@ -95,7 +95,7 @@ const renderTransportChart = (transportCtx, events) => {
     plugins: [window.ChartDataLabels],
     type: `pie`,
     data: {
-      labels: transportCount.map((element) => element.type),
+      labels: transportCount.map((element) => capitalizeString(element.type)),
       datasets: [{
         data: transportCount.map((element) => element.count),
         backgroundColor: transportCount.map(createRandomColor)
@@ -146,14 +146,14 @@ const renderTransportChart = (transportCtx, events) => {
   });
 };
 
-const renderTimeSpendChart = (timeSpendCtx, events) => {
-  const uniqueTypes = getUniqueItems(events, `type`);
+const renderTimeSpendChart = (timeSpendCtx, points) => {
+  const uniqueTypes = getUniqueItems(points, `type`);
 
   const durationByType = uniqueTypes.map((type) => {
     return ({type,
-      duration: events
-    .filter((event) => event.type === type)
-    .map((event) => (event.endDate - event.startDate))
+      duration: points
+    .filter((point) => point.type === type)
+    .map((point) => (point.endDate - point.startDate))
     });
   }).map((element) => {
     return ({
@@ -166,7 +166,7 @@ const renderTimeSpendChart = (timeSpendCtx, events) => {
     plugins: [window.ChartDataLabels],
     type: `pie`,
     data: {
-      labels: durationByType.map((element) => element.type),
+      labels: durationByType.map((element) => capitalizeString(element.type)),
       datasets: [{
         data: durationByType.map((element) => element.duration),
         backgroundColor: durationByType.map(createRandomColor)
@@ -187,7 +187,7 @@ const renderTimeSpendChart = (timeSpendCtx, events) => {
             const total = allData.reduce((acc, it) => acc + parseFloat(it));
             const tooltipPercentage = Math.round((tooltipData / total) * 100);
 
-            return `(${data.labels[tooltipItem.index]}) ${formatDay(tooltipData)}D ${formatHour(tooltipData)}H — ${tooltipPercentage}%`;
+            return `(${data.labels[tooltipItem.index]}) ${getDurationDays(tooltipData)}D ${getDurationHours(tooltipData)}H — ${tooltipPercentage}%`;
           }
         },
         displayColors: false,
@@ -268,9 +268,9 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._resetCharts();
 
-    this._moneyChart = renderMoneyChart(moneyCtx, this._pointsModel.getEventsAll());
-    this._transportChart = renderTransportChart(transportCtx, this._pointsModel.getEventsAll());
-    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, this._pointsModel.getEventsAll());
+    this._moneyChart = renderMoneyChart(moneyCtx, this._pointsModel.getPointsAll());
+    this._transportChart = renderTransportChart(transportCtx, this._pointsModel.getPointsAll());
+    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, this._pointsModel.getPointsAll());
   }
 
   _resetCharts() {
