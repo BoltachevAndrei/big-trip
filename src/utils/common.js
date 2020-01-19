@@ -1,4 +1,4 @@
-export const capitalizeString = (string) => string.split(`-`).map((element) => element[0].toUpperCase().concat(element.slice(1))).join(`-`);
+export const capitalizeString = (string) => string ? string.split(`-`).map((element) => element[0].toUpperCase().concat(element.slice(1))).join(`-`) : ``;
 
 export const getDurationDays = (duration) => window.moment.duration(duration).days();
 

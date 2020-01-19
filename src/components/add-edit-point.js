@@ -2,9 +2,14 @@ import {TYPE_TO_ICON, TYPE_TO_PLACEHOLDER} from '../const.js';
 import {capitalizeString} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`
+};
+
 const createPhotosTemplate = (pictures) => (
   pictures.map((element) => (
-    `<img class="event__photo" src="${element.src}" alt="Event photo">`)
+    `<img class="event__photo" src="${element.src}" alt="${element.description}">`)
   )
   .join(`\n`)
 );
@@ -16,11 +21,11 @@ const createDestinationsTemplate = (destinations) => (
   .join(`\n`)
 );
 
-const createOffersTemplate = (point, offers) => {
+const createOffersTemplate = (point, pointOffers, offers) => {
   const index = offers.findIndex((element) => element.type === point.type.toLowerCase());
-  return offers[index].offers.map((element) => (
+  const offersTemplate = index < 0 ? `` : offers[index].offers.map((element) => (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${element.title}-1" type="checkbox" name="event-offer-${element.title}" ${point.offers.some((pointOffer) => pointOffer.title === element.title) ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${element.title}-1" type="checkbox" name="event-offer-${element.title}" ${pointOffers.some((pointOffer) => pointOffer.title === element.title) ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${element.title}-1">
         <span class="event__offer-title">${element.title}</span>
         +
@@ -29,21 +34,60 @@ const createOffersTemplate = (point, offers) => {
     </div>`)
   )
   .join(`\n`);
+
+  return !offersTemplate ? `` : (
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+        ${offersTemplate}
+      </div>
+    </section>`);
+};
+
+const createDestinationDetailsTemplate = (description, photos) => {
+  const destinationDetailsTemplate = description ? `<section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${description}</p>
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${photos}
+      </div>
+    </div>
+  </section>` : ``;
+  return destinationDetailsTemplate;
+};
+
+
+const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate) => {
+  const offers = !offersTemplate ? `` : offersTemplate;
+  const destination = !destinationsDetailsTemplate ? `` : destinationsDetailsTemplate;
+  return ((offers || destination) ?
+    `<section class="event__details">
+      ${offers}
+      ${destination}
+    </section>` : ``);
+
 };
 
 const createAddEditPointTemplate = (point, options, offers, destinations) => {
-  const {destination, currentDescription, pictures} = options;
+  const {destination, currentDescription, pictures, externalData, pointOffers} = options;
   const description = window.he.encode(currentDescription ? currentDescription : ``);
   const photos = createPhotosTemplate(pictures);
-  const offersTemplate = createOffersTemplate(point, offers);
+  const offersTemplate = createOffersTemplate(point, pointOffers, offers);
+  const destinationDetailsTemplate = destination ? createDestinationDetailsTemplate(description, photos) : ``;
   const isFavorite = point.isFavorite ? `checked` : ``;
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
+  const eventDetails = createEventDetailsTemplate(offersTemplate, destinationDetailsTemplate);
+
+  const pointType = point.type ? point.type : ``;
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${TYPE_TO_ICON[point.type.toLowerCase()]}" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${TYPE_TO_ICON[pointType.toLowerCase()]}" alt="${pointType ? `Event type icon` : ``}">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -82,7 +126,7 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked="">
+                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
                 <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
               </div>
             </fieldset>
@@ -110,7 +154,7 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${capitalizeString(point.type)} ${TYPE_TO_PLACEHOLDER[point.type.toLowerCase()]}
+            ${capitalizeString(pointType)} ${pointType ? TYPE_TO_PLACEHOLDER[pointType.toLowerCase()] : ``}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination : ``}" list="destination-list-1">
           <datalist id="destination-list-1">
@@ -138,8 +182,8 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.basePrice ? point.basePrice : ``}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
         <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
         <label class="event__favorite-btn" for="event-favorite-1">
@@ -153,27 +197,7 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
           <span class="visually-hidden">Open event</span>
         </button>
       </header>
-      <section class="event__details">
-
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-          <div class="event__available-offers">
-            ${offersTemplate}
-          </div>
-        </section>
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
-
-          <div class="event__photos-container">
-            <div class="event__photos-tape">
-              ${photos}
-            </div>
-          </div>
-        </section>
-      </section>
+        ${eventDetails}
     </form>`
   );
 };
@@ -185,6 +209,10 @@ export default class AddEditPoint extends AbstractSmartComponent {
 
     this._offers = offers;
     this._destinations = destinations;
+
+    this._pointOffers = this._point.offers;
+
+    this._externalData = DefaultData;
 
     this._destination = this._point.destination.name;
     this._currentDescription = this._point.destination.description;
@@ -202,12 +230,18 @@ export default class AddEditPoint extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createAddEditPointTemplate(this._point, {destination: this._destination, currentDescription: this._currentDescription, pictures: this._pictures}, this._offers, this._destinations);
+    return createAddEditPointTemplate(this._point, {destination: this._destination, currentDescription: this._currentDescription, pictures: this._pictures, externalData: this._externalData, pointOffers: this._pointOffers}, this._offers, this._destinations);
   }
 
   getFormData() {
     const form = this.getElement();
     return new FormData(form);
+  }
+
+  setData(data, pointOffers) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this._pointOffers = pointOffers;
+    this.rerender();
   }
 
   recoveryListeners() {
@@ -238,6 +272,7 @@ export default class AddEditPoint extends AbstractSmartComponent {
     const point = this._point;
     this._destination = point.destination.name;
     this._currentDescription = point.destination.description;
+    this._pointOffers = point.offers;
     this.rerender();
   }
 
