@@ -2,6 +2,11 @@ import DestinationModel from './models/destination-model.js';
 import OfferModel from './models/offer-model.js';
 import PointModel from './models/point-model.js';
 
+const Code = {
+  OK: 200,
+  MULTIPLE_CHOICE: 300
+};
+
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -10,7 +15,7 @@ const Method = {
 };
 
 const checkResponseStatus = (response) => {
-  if (response.status >= 200 && response.status <= 300) {
+  if (response.status >= Code.OK && response.status <= Code.MULTIPLE_CHOICE) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
@@ -39,6 +44,21 @@ export default class API {
     return this._load({url: `offers`})
       .then((response) => response.json())
       .then(OfferModel.parseOffers);
+  }
+
+  createPoint(point) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(point.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then(PointModel.parsePoint);
+  }
+
+  deletePoint(id) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
   updatePoint(id, data) {

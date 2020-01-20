@@ -4,6 +4,8 @@ import PointModel from '../models/point-model.js';
 import {remove, render, replace, RenderPosition} from '../utils/render.js';
 import {TYPE_TO_PLACEHOLDER} from '../const.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const Mode = {
   ADD: `add`,
   EDIT: `edit`,
@@ -20,8 +22,9 @@ const getType = (rawType) => {
 const parseFormData = (formData, generatedOffers) => {
   const type = getType(document.querySelector(`.event__type-output`).innerText);
   const offerNamePrefix = `event-offer-`;
-  const offersForType = generatedOffers.filter((element) => element.type === type)[0].offers;
-  const offers = offersForType.filter((element) => formData.get(`${offerNamePrefix}${element.title}`) === `on`);
+  const offersForType = type ? generatedOffers.filter((element) => element.type === type)[0].offers : [];
+  const offers = offersForType ? offersForType.filter((element) => formData.get(`${offerNamePrefix}${element.title}`) === `on`) : [];
+  const pictures = Array.from(document.querySelectorAll(`.event__photo`)).map((picture) => ({src: picture.src, description: picture.alt}));
   return new PointModel({
     'base_price': Number.parseInt(formData.get(`event-price`), 10),
     'date_from': new Date(formData.get(`event-start-time`)),
@@ -29,19 +32,16 @@ const parseFormData = (formData, generatedOffers) => {
     'destination': {
       name: formData.get(`event-destination`),
       description: document.querySelector(`.event__destination-description`).innerText,
-      pictures: []
+      pictures
     },
-    'id': String(new Date() + Math.random()),
     'is_favorite': formData.get(`event-favorite`),
     'offers': offers,
     'type': type
   });
 };
 
-const getFirstKey = (object) => Object.keys(object)[0];
-
 export const EmptyPoint = {
-  type: getFirstKey(TYPE_TO_PLACEHOLDER),
+  type: ``,
   startDate: null,
   endDate: null,
   destination: {
@@ -93,9 +93,20 @@ export default class PointController {
       const formData = this._addEditPointComponent.getFormData();
       const data = parseFormData(formData, this._offers);
       this._onDataChange(this, point, data);
+      this._addEditPointComponent.setData({
+        saveButtonText: `Saving...`
+      }, data.offers);
     });
 
-    this._addEditPointComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
+
+    this._addEditPointComponent.setDeleteButtonClickHandler(() => {
+      const formData = this._addEditPointComponent.getFormData();
+      const data = parseFormData(formData, this._offers);
+      this._onDataChange(this, point, null);
+      this._addEditPointComponent.setData({
+        deleteButtonText: `Deleting...`
+      }, data.offers);
+    });
 
     switch (mode) {
       case Mode.VIEW:
@@ -128,6 +139,19 @@ export default class PointController {
     remove(this._pointComponent);
     remove(this._addEditPointComponent);
     document.removeEventListener(`keydown`, this._onEscKeydown);
+  }
+
+  shake() {
+    this._addEditPointComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._pointComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      this._addEditPointComponent.getElement().style.animation = ``;
+      this._pointComponent.getElement().style.animation = ``;
+      this._addEditPointComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _replaceAddEditToPoint() {

@@ -7,7 +7,7 @@ import Statisctics from './components/statistics.js';
 import PointsModel from './models/points-model.js';
 
 const AUTHORIZATION_KEY = `Basic kTy9GIdsz2317rD`;
-const REMOTE_HOST = `https://htmlacademy-es-10.appspot.com/big-trip/`;
+const REMOTE_HOST = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
 const api = new API(REMOTE_HOST, AUTHORIZATION_KEY);
 const pointsModel = new PointsModel();

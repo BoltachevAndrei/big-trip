@@ -4,7 +4,7 @@ export default class PointModel {
     this.startDate = data[`date_from`] ? new Date(data[`date_from`]) : null;
     this.endDate = data[`date_to`] ? new Date(data[`date_to`]) : null;
     this.destination = data[`destination`];
-    this.id = data[`id`] || ``;
+    this.id = data[`id`];
     this.isFavorite = !!data[`is_favorite`];
     this.offers = data[`offers`] || [];
     this.type = data[`type`];
