@@ -1,3 +1,5 @@
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import AbstractSmartComponent from './abstract-smart-component';
 import {capitalizeString, getDurationHours, getDurationDays} from '../utils/common.js';
 
@@ -26,8 +28,8 @@ const renderMoneyChart = (moneyCtx, points) => {
     });
   });
 
-  return new window.Chart(moneyCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(moneyCtx, {
+    plugins: [ChartDataLabels],
     type: `pie`,
     data: {
       labels: moneyByType.map((element) => capitalizeString(element.type)),
@@ -91,8 +93,8 @@ const renderTransportChart = (transportCtx, points) => {
     });
   });
 
-  return new window.Chart(transportCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(transportCtx, {
+    plugins: [ChartDataLabels],
     type: `pie`,
     data: {
       labels: transportCount.map((element) => capitalizeString(element.type)),
@@ -162,8 +164,8 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
     });
   });
 
-  return new window.Chart(timeSpendCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(timeSpendCtx, {
+    plugins: [ChartDataLabels],
     type: `pie`,
     data: {
       labels: durationByType.map((element) => capitalizeString(element.type)),
