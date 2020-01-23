@@ -1,6 +1,6 @@
-import DestinationModel from './models/destination-model.js';
-import OfferModel from './models/offer-model.js';
-import PointModel from './models/point-model.js';
+import DestinationModel from '../models/destination-model.js';
+import OfferModel from '../models/offer-model.js';
+import PointModel from '../models/point-model.js';
 
 const Code = {
   OK: 200,
@@ -22,7 +22,7 @@ const checkResponseStatus = (response) => {
   }
 };
 
-export default class API {
+export default class Api {
   constructor(remoteHost, authorizationKey) {
     this._remoteHost = remoteHost;
     this._authorizationKey = authorizationKey;
@@ -70,6 +70,16 @@ export default class API {
     })
       .then((response) => response.json())
       .then(PointModel.parsePoint);
+  }
+
+  sync(data) {
+    return this._load({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json());
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

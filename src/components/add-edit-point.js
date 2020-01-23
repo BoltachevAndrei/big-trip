@@ -1,3 +1,5 @@
+import flatpickr from 'flatpickr';
+import he from 'he';
 import {TYPE_TO_ICON, TYPE_TO_PLACEHOLDER} from '../const.js';
 import {capitalizeString} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
@@ -71,7 +73,7 @@ const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate)
 
 const createAddEditPointTemplate = (point, options, offers, destinations) => {
   const {destination, currentDescription, pictures, externalData, pointOffers} = options;
-  const description = window.he.encode(currentDescription ? currentDescription : ``);
+  const description = he.encode(currentDescription ? currentDescription : ``);
   const photos = createPhotosTemplate(pictures);
   const offersTemplate = createOffersTemplate(point, pointOffers, offers);
   const destinationDetailsTemplate = destination ? createDestinationDetailsTemplate(description, photos) : ``;
@@ -302,7 +304,7 @@ export default class AddEditPoint extends AbstractSmartComponent {
     }
 
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
-    this._flatpickrStartDate = window.flatpickr(startDateElement, {
+    this._flatpickrStartDate = flatpickr(startDateElement, {
       altInput: true,
       allowInput: true,
       enableTime: true,
@@ -311,7 +313,7 @@ export default class AddEditPoint extends AbstractSmartComponent {
     });
 
     const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
-    this._flatpickrEndDate = window.flatpickr(endDateElement, {
+    this._flatpickrEndDate = flatpickr(endDateElement, {
       altInput: true,
       allowInput: true,
       enableTime: true,

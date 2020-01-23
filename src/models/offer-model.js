@@ -4,11 +4,11 @@ export default class OfferModel {
     this.offers = data[`offers`] || [];
   }
 
-  parseOffer(data) {
+  static parseOffer(data) {
     return new OfferModel(data);
   }
 
-  parseOffers(data) {
+  static parseOffers(data) {
     return data.map(OfferModel.parseOffer);
   }
 }
