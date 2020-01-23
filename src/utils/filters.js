@@ -1,7 +1,7 @@
 import {isFutureDate, isPastDate} from '../utils/common.js';
 import {FilterType} from '../const.js';
 
-export const getFuturePoints = (points) => points.filter((element) => isFutureDate(element.endDate));
+export const getFuturePoints = (points) => points.filter((element) => isFutureDate(element.startDate));
 
 export const getPastPoints = (points) => points.filter((element) => isPastDate(element.endDate));
 

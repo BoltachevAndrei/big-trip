@@ -20,6 +20,10 @@ export default class PointsModel {
     return getPointsByFilter(this._points, this._activeFilterType);
   }
 
+  getPointsWithFilter(filter) {
+    return getPointsByFilter(this._points, filter);
+  }
+
   getPointsAll() {
     return this._points;
   }

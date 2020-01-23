@@ -31,7 +31,7 @@ const parseFormData = (formData, generatedOffers) => {
     'date_to': new Date(formData.get(`event-end-time`)),
     'destination': {
       name: formData.get(`event-destination`),
-      description: document.querySelector(`.event__destination-description`).innerText,
+      description: document.querySelector(`.event__destination-description`) ? document.querySelector(`.event__destination-description`).innerText : ``,
       pictures
     },
     'is_favorite': formData.get(`event-favorite`),
@@ -45,6 +45,8 @@ export const EmptyPoint = {
   startDate: null,
   endDate: null,
   destination: {
+    name: ``,
+    description: ``,
     pictures: []
   },
   price: ``,
@@ -75,7 +77,7 @@ export default class PointController {
     this._mode = mode;
 
     this._pointComponent = new Point(point);
-    this._addEditPointComponent = new AddEditPoint(point, this._offers, this._destinations);
+    this._addEditPointComponent = new AddEditPoint(point, this._mode, this._offers, this._destinations);
 
     this._pointComponent.setRollupButtonClickHandler(() => {
       this._replacePointToAddEdit();
@@ -103,9 +105,11 @@ export default class PointController {
       const formData = this._addEditPointComponent.getFormData();
       const data = parseFormData(formData, this._offers);
       this._onDataChange(this, point, null);
-      this._addEditPointComponent.setData({
-        deleteButtonText: `Deleting...`
-      }, data.offers);
+      if (this._mode !== Mode.ADD) {
+        this._addEditPointComponent.setData({
+          deleteButtonText: `Deleting...`
+        }, data.offers);
+      }
     });
 
     switch (mode) {
