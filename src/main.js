@@ -38,7 +38,6 @@ render(menuContainer, menuComponent, RenderPosition.AFTER);
 
 const filtersContainer = document.querySelector(`.trip-controls h2:nth-of-type(2)`);
 const filtersController = new FiltersController(filtersContainer, pointsModel);
-filtersController.render();
 
 const tripPointsContainer = document.querySelector(`.trip-events`);
 const tripController = new TripController(tripPointsContainer, pointsModel, apiWithProvider);
@@ -50,6 +49,8 @@ apiWithProvider.getDestinations()
   .then(() => apiWithProvider.getPoints())
   .then((points) => {
     pointsModel.setPoints(points);
+
+    filtersController.render();
 
     const statisticsComponent = new Statisctics(pointsModel);
     render(tripPointsContainer, statisticsComponent, RenderPosition.AFTER);

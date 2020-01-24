@@ -3,8 +3,14 @@ import he from 'he';
 import {TYPE_TO_ICON, TYPE_TO_PLACEHOLDER} from '../const.js';
 import {capitalizeString} from '../utils/common.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import debounce from 'lodash/debounce';
+
+import {Mode} from '../controllers/point-controller.js';
+
+const DEBOUNCE_TIMEOUT = 1000;
 
 const DefaultData = {
+  cancelButtonText: `Cancel`,
   deleteButtonText: `Delete`,
   saveButtonText: `Save`
 };
@@ -59,7 +65,6 @@ const createDestinationDetailsTemplate = (description, photos) => {
   return destinationDetailsTemplate;
 };
 
-
 const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate) => {
   const offers = !offersTemplate ? `` : offersTemplate;
   const destination = !destinationsDetailsTemplate ? `` : destinationsDetailsTemplate;
@@ -71,14 +76,27 @@ const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate)
 
 };
 
-const createAddEditPointTemplate = (point, options, offers, destinations) => {
+const createFavoriteButtonTemplate = (isFavorite) => {
+  const checked = isFavorite ? `checked` : ``;
+  return (
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checked}>
+      <label class="event__favorite-btn" for="event-favorite-1">
+        <span class="visually-hidden">Add to favorite</span>
+        <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+          <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"></path>
+        </svg>
+      </label>`
+  );
+};
+
+const createAddEditPointTemplate = (point, mode, options, offers, destinations) => {
   const {destination, currentDescription, pictures, externalData, pointOffers} = options;
   const description = he.encode(currentDescription ? currentDescription : ``);
   const photos = createPhotosTemplate(pictures);
   const offersTemplate = createOffersTemplate(point, pointOffers, offers);
   const destinationDetailsTemplate = destination ? createDestinationDetailsTemplate(description, photos) : ``;
-  const isFavorite = point.isFavorite ? `checked` : ``;
-  const deleteButtonText = externalData.deleteButtonText;
+  const isFavorite = (mode === Mode.ADD) ? `` : createFavoriteButtonTemplate(point.isFavorite);
+  const deleteButtonText = (mode === Mode.ADD ? externalData.cancelButtonText : externalData.deleteButtonText);
   const saveButtonText = externalData.saveButtonText;
   const eventDetails = createEventDetailsTemplate(offersTemplate, destinationDetailsTemplate);
 
@@ -187,13 +205,7 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
         <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
-        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
-        <label class="event__favorite-btn" for="event-favorite-1">
-          <span class="visually-hidden">Add to favorite</span>
-          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"></path>
-          </svg>
-        </label>
+        ${isFavorite}
 
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -205,9 +217,11 @@ const createAddEditPointTemplate = (point, options, offers, destinations) => {
 };
 
 export default class AddEditPoint extends AbstractSmartComponent {
-  constructor(point, offers, destinations) {
+  constructor(point, mode, offers, destinations) {
     super();
     this._point = point;
+
+    this._mode = mode;
 
     this._offers = offers;
     this._destinations = destinations;
@@ -232,7 +246,7 @@ export default class AddEditPoint extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createAddEditPointTemplate(this._point, {destination: this._destination, currentDescription: this._currentDescription, pictures: this._pictures, externalData: this._externalData, pointOffers: this._pointOffers}, this._offers, this._destinations);
+    return createAddEditPointTemplate(this._point, this._mode, {destination: this._destination, currentDescription: this._currentDescription, pictures: this._pictures, externalData: this._externalData, pointOffers: this._pointOffers}, this._offers, this._destinations);
   }
 
   getFormData() {
@@ -289,8 +303,10 @@ export default class AddEditPoint extends AbstractSmartComponent {
   }
 
   setFavoriteButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
-    this._favoriteButtonHanlder = handler;
+    if (this.getElement().querySelector(`.event__favorite-checkbox`)) {
+      this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
+      this._favoriteButtonHanlder = handler;
+    }
   }
 
   _applyFlatpickr() {

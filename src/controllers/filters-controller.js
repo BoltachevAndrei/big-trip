@@ -14,9 +14,11 @@ export default class FiltersController {
   }
 
   render() {
+    const pointsCountByFilter = {};
+    Object.values(FilterType).forEach((filter) => Object.assign(pointsCountByFilter, {[filter]: this._pointsModel.getPointsWithFilter(filter).length}));
     const container = this._container;
     const oldFiltersComponent = this._filtersComponent;
-    this._filtersComponent = new Filters(this._activeFilterType);
+    this._filtersComponent = new Filters(this._activeFilterType, pointsCountByFilter);
     this._filtersComponent.setFilterChangeHandler(this._onFilterChange);
     if (oldFiltersComponent) {
       replace(this._filtersComponent, oldFiltersComponent);
