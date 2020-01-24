@@ -24,7 +24,7 @@ const renderMoneyChart = (moneyCtx, points) => {
   }).map((element) => {
     return ({
       type: element.type,
-      price: element.price.reduce((prev, next) => prev + next)
+      price: element.price.reduce((prev, next) => prev + next, 0)
     });
   });
 
@@ -49,7 +49,7 @@ const renderMoneyChart = (moneyCtx, points) => {
           label: (tooltipItem, data) => {
             const allData = data.datasets[tooltipItem.datasetIndex].data;
             const tooltipData = allData[tooltipItem.index];
-            const total = allData.reduce((acc, it) => acc + parseFloat(it));
+            const total = allData.reduce((acc, it) => acc + parseFloat(it), 0);
             const tooltipPercentage = Math.round((tooltipData / total) * 100);
             return `(${data.labels[tooltipItem.index]}) ${tooltipData}${EURO_SIGN} — ${tooltipPercentage}%`;
           }
@@ -114,7 +114,7 @@ const renderTransportChart = (transportCtx, points) => {
           label: (tooltipItem, data) => {
             const allData = data.datasets[tooltipItem.datasetIndex].data;
             const tooltipData = allData[tooltipItem.index];
-            const total = allData.reduce((acc, it) => acc + parseFloat(it));
+            const total = allData.reduce((acc, it) => acc + parseFloat(it), 0);
             const tooltipPercentage = Math.round((tooltipData / total) * 100);
             return `(${data.labels[tooltipItem.index]}) ${tooltipData} — ${tooltipPercentage}%`;
           }
@@ -160,7 +160,7 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
   }).map((element) => {
     return ({
       type: element.type,
-      duration: (element.duration.reduce((prev, next) => prev + next))
+      duration: (element.duration.reduce((prev, next) => prev + next, 0))
     });
   });
 
@@ -186,7 +186,7 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
             const allData = data.datasets[tooltipItem.datasetIndex].data;
             const tooltipData = allData[tooltipItem.index];
 
-            const total = allData.reduce((acc, it) => acc + parseFloat(it));
+            const total = allData.reduce((acc, it) => acc + parseFloat(it), 0);
             const tooltipPercentage = Math.round((tooltipData / total) * 100);
 
             return `(${data.labels[tooltipItem.index]}) ${getDurationDays(tooltipData)}D ${getDurationHours(tooltipData)}H — ${tooltipPercentage}%`;

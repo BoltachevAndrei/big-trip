@@ -1,6 +1,19 @@
 import {formatDate, formatDay} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
+const createRouteTemplate = (points) => {
+  let route = [];
+  points.forEach((value, index, array) => {
+    if (value !== array[index - 1]) {
+      route.push(value.destination.name);
+    }
+  });
+  if (route.length > 3) {
+    return `${route[0]} — ... — ${route[route.length - 1]}`;
+  }
+  return route.join(` — `);
+};
+
 const createTripInfoTemplate = (points) => {
   const startDate = formatDate(points[0].startDate);
   const endDate = points[0].startDate.getMonth() === points[points.length - 1].endDate.getMonth() ? formatDay(points[points.length - 1].endDate) : formatDate(points[points.length - 1].endDate);
@@ -8,11 +21,12 @@ const createTripInfoTemplate = (points) => {
   const basePrice = points.map((element) => element.basePrice).reduce((previousValue, currentValue) => previousValue + currentValue, 0);
   const tripPrice = basePrice + offersPrice;
   const tripPriceContainer = document.querySelector(`.trip-info__cost-value`);
+  const route = createRouteTemplate(points);
   tripPriceContainer.innerHTML = tripPrice;
   return (
     `<div class="trip-info__main">
-      <h1 class="trip-info__title">${points[0].destination.name} — ... — ${points[points.length - 1].destination.name}</h1>
-      <p class="trip-info__dates">${startDate}&nbsp;—&nbsp;${endDate}</p>
+      <h1 class="trip-info__title">${route}</h1>
+      <p class="trip-info__dates">${startDate ? startDate : ``}&nbsp;—&nbsp;${endDate ? endDate : ``}</p>
     </div>`
   );
 };

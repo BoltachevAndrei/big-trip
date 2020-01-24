@@ -2,7 +2,7 @@ import {TYPE_TO_ICON, TYPE_TO_PLACEHOLDER} from "../const";
 import {capitalizeString, formatTime, getDurationDays, getDurationHours, getDurationMinutes} from '../utils/common.js';
 import AbstractComponent from "./abstract-component";
 
-const OFFERS_SHOW_LIMIT = 2;
+const OFFERS_SHOW_LIMIT = 3;
 
 const formatDuration = (duration) => {
   if (duration < 0) {

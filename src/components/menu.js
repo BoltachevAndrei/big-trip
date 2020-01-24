@@ -40,6 +40,7 @@ export default class Menu extends AbstractComponent {
     });
 
     const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
+    newEventButton.disabled = false;
     newEventButton.addEventListener(`click`, (evt) => {
       if (evt.target.tagName.toLowerCase() === `button`) {
         const menuItem = evt.target.innerText;

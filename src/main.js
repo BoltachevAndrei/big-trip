@@ -9,6 +9,8 @@ import Statisctics from './components/statistics.js';
 import PointsModel from './models/points-model.js';
 import 'flatpickr/dist/flatpickr.css';
 
+import LoadingPoints from './components/loading-points.js';
+
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
@@ -41,6 +43,9 @@ const filtersController = new FiltersController(filtersContainer, pointsModel);
 
 const tripPointsContainer = document.querySelector(`.trip-events`);
 const tripController = new TripController(tripPointsContainer, pointsModel, apiWithProvider);
+
+const loadingPointsComponent = new LoadingPoints();
+render(tripPointsContainer, loadingPointsComponent, RenderPosition.AFTERBEGIN);
 
 apiWithProvider.getDestinations()
   .then((destinations) => pointsModel.setDestinations(destinations))
@@ -75,6 +80,10 @@ apiWithProvider.getDestinations()
     });
 
     tripController.render();
+  })
+  .finally(() => {
+    loadingPointsComponent.getElement().remove();
+    loadingPointsComponent.removeElement();
   });
 
 window.addEventListener(`online`, () => {

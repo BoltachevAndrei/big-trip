@@ -4,8 +4,8 @@ import AbstractComponent from "./abstract-component";
 const createTripDaysTemplate = (element, index) => (
   `<li class="trip-days__item  day">
     <div class="day__info">
-      <span class="day__counter">${index + 1}</span>
-      <time class="day__date" datetime="${element[0].startDate}">${formatDate(element[0].startDate)}</time>
+      <span class="day__counter">${index ? index : ``}</span>
+      <time class="day__date" datetime="${element ? element[0].startDate : ``}">${element ? formatDate(element[0].startDate) : ``}</time>
     </div>
 
     <ul class="trip-events__list">

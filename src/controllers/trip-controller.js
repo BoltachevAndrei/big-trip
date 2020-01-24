@@ -21,30 +21,38 @@ const renderPoints = (pointsContainer, points, sortType, onDataChange, onViewCha
 
   if (sortType !== SortType.DEFAULT) {
     groupedPoints = [points.slice()];
-  } else {
-    const sortedPoints = sortPointsByDate(points);
-    groupedPoints = groupPointsByDate(sortedPoints);
-  }
-
-  groupedPoints.forEach((group, day) => {
-    const newDay = renderTripDay(group, day);
-    group.map((element) => {
-      const pointController = new PointController(newDay.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange, offers, destinations);
-      pointController.render(element, PointsControllerMode.VIEW);
-      showedPointControllers = showedPointControllers.concat(pointController);
-      return pointController;
+    groupedPoints.forEach((group) => {
+      const newDay = renderTripDay(null, null);
+      group.map((element) => {
+        const pointController = new PointController(newDay.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange, offers, destinations);
+        pointController.render(element, PointsControllerMode.VIEW);
+        showedPointControllers = showedPointControllers.concat(pointController);
+        return pointController;
+      });
     });
-  });
-  return showedPointControllers;
+    return showedPointControllers;
+  } else {
+    groupedPoints = groupPointsByDate(points);
+    groupedPoints.forEach((group, day) => {
+      const newDay = renderTripDay(group, day + 1);
+      group.map((element) => {
+        const pointController = new PointController(newDay.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange, offers, destinations);
+        pointController.render(element, PointsControllerMode.VIEW);
+        showedPointControllers = showedPointControllers.concat(pointController);
+        return pointController;
+      });
+    });
+    return showedPointControllers;
+  }
 };
 
 const groupPointsByDate = (points) => {
   const sortedPoints = sortPointsByDate(points);
   const groupPoints = [];
-  groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[0].startDate.getDate()));
+  groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[0].startDate.getDate() && element.startDate.getMonth() === sortedPoints[0].startDate.getMonth()));
   for (let i = 1; i < sortedPoints.length; i++) {
-    if (sortedPoints[i].startDate.getDate() !== sortedPoints[i - 1].startDate.getDate()) {
-      groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[i].startDate.getDate()));
+    if (sortedPoints[i].startDate.getDate() !== sortedPoints[i - 1].startDate.getDate() || sortedPoints[i].startDate.getMonth() !== sortedPoints[i - 1].startDate.getMonth()) {
+      groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[i].startDate.getDate() && element.startDate.getMonth() === sortedPoints[i].startDate.getMonth()));
     }
   }
   return groupPoints;
@@ -95,7 +103,7 @@ export default class TripController {
     const destinations = this._pointsModel.getDestinations();
     const isNoPoints = points.length <= 0;
     if (isNoPoints) {
-      render(this._container, isNoPoints, RenderPosition.BEFOREEND);
+      render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
       return;
     }
 

@@ -199,7 +199,7 @@ const createAddEditPointTemplate = (point, mode, options, offers, destinations) 
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.basePrice ? point.basePrice : ``}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${point.basePrice ? point.basePrice : ``}" min="0" step="1">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
@@ -309,6 +309,11 @@ export default class AddEditPoint extends AbstractSmartComponent {
     }
   }
 
+  setRollupButtonClickHandler(handler) {
+    const pointRollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    pointRollupButton.addEventListener(`click`, handler);
+  }
+
   _applyFlatpickr() {
     if (this._flatpickrStartDate) {
       this._flatpickrStartDate.destroy();
@@ -362,6 +367,32 @@ export default class AddEditPoint extends AbstractSmartComponent {
         this._pictures = this._destinations.filter((destination) => destination.name === evt.target.value)[0].pictures;
         this.rerender();
       }
+    });
+
+    const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
+    startDateElement.addEventListener(`change`, () => {
+      const endDate = this.getElement().querySelector(`#event-end-time-1`);
+      this._flatpickrEndDate = flatpickr(endDate, {
+        altInput: true,
+        allowInput: true,
+        enableTime: true,
+        defaultDate: endDate.value,
+        altFormat: `d/m/y H:i`,
+        minDate: startDateElement.value
+      });
+    });
+
+    const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
+    endDateElement.addEventListener(`change`, () => {
+      const startDate = this.getElement().querySelector(`#event-start-time-1`);
+      this._flatpickrStartDate = flatpickr(startDate, {
+        altInput: true,
+        allowInput: true,
+        enableTime: true,
+        defaultDate: startDate.value,
+        altFormat: `d/m/y H:i`,
+        maxDate: endDateElement.value
+      });
     });
   }
 }

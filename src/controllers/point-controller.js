@@ -100,7 +100,6 @@ export default class PointController {
       }, data.offers);
     });
 
-
     this._addEditPointComponent.setDeleteButtonClickHandler(() => {
       const formData = this._addEditPointComponent.getFormData();
       const data = parseFormData(formData, this._offers);
@@ -170,6 +169,7 @@ export default class PointController {
   _replacePointToAddEdit() {
     this._onViewChange();
     replace(this._addEditPointComponent, this._pointComponent);
+    this._addEditPointComponent.setRollupButtonClickHandler(() => this._replaceAddEditToPoint());
     this._mode = Mode.EDIT;
   }
 
