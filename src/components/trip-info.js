@@ -2,7 +2,7 @@ import {formatDate, formatDay} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
 const createRouteTemplate = (points) => {
-  let route = [];
+  const route = [];
   points.forEach((value, index, array) => {
     if (value !== array[index - 1]) {
       route.push(value.destination.name);
