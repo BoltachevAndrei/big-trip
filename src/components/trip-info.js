@@ -1,6 +1,8 @@
 import {formatDate, formatDay} from '../utils/common.js';
 import AbstractComponent from './abstract-component.js';
 
+const TRIP_INFO_POINTS_LIMIT = 3;
+
 const createRouteTemplate = (points) => {
   const route = [];
   points.forEach((value, index, array) => {
@@ -8,7 +10,7 @@ const createRouteTemplate = (points) => {
       route.push(value.destination.name);
     }
   });
-  if (route.length > 3) {
+  if (route.length > TRIP_INFO_POINTS_LIMIT) {
     return `${route[0]} — ... — ${route[route.length - 1]}`;
   }
   return route.join(` — `);
