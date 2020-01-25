@@ -42,21 +42,6 @@ export const EMPTY_POINT = {
   offers: []
 };
 
-export const MONTHS = [
-  `Jan`,
-  `Feb`,
-  `Mar`,
-  `Apr`,
-  `May`,
-  `Jun`,
-  `Jul`,
-  `Aug`,
-  `Sept`,
-  `Oct`,
-  `Nov`,
-  `Dec`
-];
-
 export const FilterType = {
   EVERYTHING: `everything`,
   FUTURE: `future`,
