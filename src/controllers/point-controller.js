@@ -2,7 +2,7 @@ import AddEditPoint from '../components/add-edit-point.js';
 import Point from '../components/point.js';
 import PointModel from '../models/point-model.js';
 import {remove, render, replace, RenderPosition} from '../utils/render.js';
-import {TYPE_TO_PLACEHOLDER} from '../const.js';
+import {TYPE_TO_PLACEHOLDER, DEFAULT_TYPE} from '../const.js';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -41,7 +41,7 @@ const parseFormData = (formData, generatedOffers) => {
 };
 
 export const EmptyPoint = {
-  type: ``,
+  type: DEFAULT_TYPE,
   startDate: null,
   endDate: null,
   destination: {

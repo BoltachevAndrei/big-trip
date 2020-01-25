@@ -1,5 +1,5 @@
 import {render, RenderPosition} from '../utils/render.js';
-import {HIDDEN_CLASS} from '../const.js';
+import {HIDDEN_CLASS, DEFAULT_TYPE} from '../const.js';
 
 import Board from '../components/board.js';
 import NoPoints from '../components/no-points.js';
@@ -126,8 +126,10 @@ export default class TripController {
     if (this._creatingPoint) {
       return;
     }
+    this.render();
     const tripDaysContainer = document.querySelector(`.trip-days`);
     this._creatingPoint = new PointController(tripDaysContainer, this._onDataChange, this._onViewChange, this._pointsModel.getOffers(), this._pointsModel.getDestinations());
+    EmptyPoint.type = DEFAULT_TYPE;
     this._creatingPoint.render(EmptyPoint, PointsControllerMode.ADD);
   }
 
@@ -145,7 +147,6 @@ export default class TripController {
             const destroyedPoint = this._showedPointControllers.pop();
             destroyedPoint.destroy();
             this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
-            oldData.type = ``;
             this.render();
             this._statistics.rerender(this._pointsModel);
             this._statistics.hide();

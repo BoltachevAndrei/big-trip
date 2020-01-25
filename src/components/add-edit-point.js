@@ -65,13 +65,11 @@ const createDestinationDetailsTemplate = (description, photos) => {
   return destinationDetailsTemplate;
 };
 
-const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate) => {
-  const offers = !offersTemplate ? `` : offersTemplate;
-  const destination = !destinationsDetailsTemplate ? `` : destinationsDetailsTemplate;
-  return ((offers || destination) ?
+const createEventDetailsTemplate = (offersTemplate, destinationDetailsTemplate, point, destination) => {
+  return ((point.type && destination) ?
     `<section class="event__details">
-      ${offers}
-      ${destination}
+      ${offersTemplate}
+      ${destinationDetailsTemplate}
     </section>` : ``
   );
 };
@@ -105,7 +103,7 @@ const createAddEditPointTemplate = (point, mode, options, offers, destinations) 
   const rollupButton = (mode === Mode.ADD) ? `` : createRollupButtonTemplate();
   const deleteButtonText = (mode === Mode.ADD ? externalData.cancelButtonText : externalData.deleteButtonText);
   const saveButtonText = externalData.saveButtonText;
-  const eventDetails = createEventDetailsTemplate(offersTemplate, destinationDetailsTemplate);
+  const eventDetails = createEventDetailsTemplate(offersTemplate, destinationDetailsTemplate, point, destination);
 
   const pointType = point.type ? point.type : ``;
   return (
@@ -355,7 +353,6 @@ export default class AddEditPoint extends AbstractSmartComponent {
     element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName.toLowerCase() === `label`) {
         this._point.type = evt.target.innerHTML;
-        this._destination = ``;
         this.rerender();
       }
     });

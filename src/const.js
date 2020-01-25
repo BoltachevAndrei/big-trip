@@ -26,6 +26,8 @@ export const TYPE_TO_PLACEHOLDER = {
   'restaurant': `in`
 };
 
+export const DEFAULT_TYPE = `taxi`;
+
 export const MONTHS = [
   `Jan`,
   `Feb`,
