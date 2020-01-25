@@ -255,6 +255,8 @@ export default class Statistics extends AbstractSmartComponent {
     return createStatisticsTemplate();
   }
 
+  recoveryListeners() {}
+
   rerender(pointsModel) {
     this._pointsModel = pointsModel;
     super.rerender();

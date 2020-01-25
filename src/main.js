@@ -6,10 +6,9 @@ import FiltersController from './controllers/filters-controller.js';
 import TripController from './controllers/trip-controller.js';
 import Menu, {MenuItem} from './components/menu.js';
 import Statisctics from './components/statistics.js';
+import LoadingPoints from './components/loading-points.js';
 import PointsModel from './models/points-model.js';
 import 'flatpickr/dist/flatpickr.css';
-
-import LoadingPoints from './components/loading-points.js';
 
 const STORE_PREFIX = `big-trip-localstorage`;
 const STORE_VER = `v1`;
@@ -42,7 +41,6 @@ const filtersContainer = document.querySelector(`.trip-controls h2:nth-of-type(2
 const filtersController = new FiltersController(filtersContainer, pointsModel);
 
 const tripPointsContainer = document.querySelector(`.trip-events`);
-const tripController = new TripController(tripPointsContainer, pointsModel, apiWithProvider);
 
 const loadingPointsComponent = new LoadingPoints();
 render(tripPointsContainer, loadingPointsComponent, RenderPosition.AFTERBEGIN);
@@ -54,10 +52,9 @@ apiWithProvider.getDestinations()
   .then(() => apiWithProvider.getPoints())
   .then((points) => {
     pointsModel.setPoints(points);
-
     filtersController.render();
-
     const statisticsComponent = new Statisctics(pointsModel);
+    const tripController = new TripController(tripPointsContainer, pointsModel, apiWithProvider, statisticsComponent);
     render(tripPointsContainer, statisticsComponent, RenderPosition.AFTER);
     statisticsComponent.hide();
     menuComponent.setOnChange((menuItem) => {
@@ -69,16 +66,17 @@ apiWithProvider.getDestinations()
           tripController.createPoint();
           break;
         case MenuItem.TABLE:
+          menuComponent.setActiveItem(MenuItem.TABLE);
           statisticsComponent.hide();
           tripController.show();
           break;
         case MenuItem.STATS:
+          menuComponent.setActiveItem(MenuItem.STATS);
           statisticsComponent.show();
           tripController.hide();
           break;
       }
     });
-
     tripController.render();
   })
   .finally(() => {
@@ -88,7 +86,6 @@ apiWithProvider.getDestinations()
 
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
-
   if (!apiWithProvider.getSynchronizeStatus()) {
     apiWithProvider.sync()
       .then(() => {

@@ -31,7 +31,7 @@ const createDestinationsTemplate = (destinations) => (
 
 const createOffersTemplate = (point, pointOffers, offers) => {
   const index = offers.findIndex((element) => element.type === point.type.toLowerCase());
-  const offersTemplate = index < 0 ? `` : offers[index].offers.map((element) => (
+  const offersTemplate = index < 0 || !pointOffers ? `` : offers[index].offers.map((element) => (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${element.title}-1" type="checkbox" name="event-offer-${element.title}" ${pointOffers.some((pointOffer) => pointOffer.title === element.title) ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${element.title}-1">
@@ -72,8 +72,8 @@ const createEventDetailsTemplate = (offersTemplate, destinationsDetailsTemplate)
     `<section class="event__details">
       ${offers}
       ${destination}
-    </section>` : ``);
-
+    </section>` : ``
+  );
 };
 
 const createFavoriteButtonTemplate = (isFavorite) => {
@@ -89,6 +89,12 @@ const createFavoriteButtonTemplate = (isFavorite) => {
   );
 };
 
+const createRollupButtonTemplate = () => (
+  `<button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>`
+);
+
 const createAddEditPointTemplate = (point, mode, options, offers, destinations) => {
   const {destination, currentDescription, pictures, externalData, pointOffers} = options;
   const description = he.encode(currentDescription ? currentDescription : ``);
@@ -96,6 +102,7 @@ const createAddEditPointTemplate = (point, mode, options, offers, destinations) 
   const offersTemplate = createOffersTemplate(point, pointOffers, offers);
   const destinationDetailsTemplate = destination ? createDestinationDetailsTemplate(description, photos) : ``;
   const isFavorite = (mode === Mode.ADD) ? `` : createFavoriteButtonTemplate(point.isFavorite);
+  const rollupButton = (mode === Mode.ADD) ? `` : createRollupButtonTemplate();
   const deleteButtonText = (mode === Mode.ADD ? externalData.cancelButtonText : externalData.deleteButtonText);
   const saveButtonText = externalData.saveButtonText;
   const eventDetails = createEventDetailsTemplate(offersTemplate, destinationDetailsTemplate);
@@ -207,9 +214,8 @@ const createAddEditPointTemplate = (point, mode, options, offers, destinations) 
 
         ${isFavorite}
 
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        ${rollupButton}
+
       </header>
         ${eventDetails}
     </form>`
