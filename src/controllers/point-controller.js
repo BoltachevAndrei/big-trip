@@ -2,7 +2,7 @@ import AddEditPoint from '../components/add-edit-point.js';
 import Point from '../components/point.js';
 import PointModel from '../models/point-model.js';
 import {remove, render, replace, RenderPosition} from '../utils/render.js';
-import {TYPE_TO_PLACEHOLDER, DEFAULT_TYPE} from '../const.js';
+import {TYPE_TO_PLACEHOLDER, EMPTY_POINT} from '../const.js';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -38,20 +38,6 @@ const parseFormData = (formData, generatedOffers) => {
     'offers': offers,
     'type': type
   });
-};
-
-export const EmptyPoint = {
-  type: DEFAULT_TYPE,
-  startDate: null,
-  endDate: null,
-  destination: {
-    name: ``,
-    description: ``,
-    pictures: []
-  },
-  price: ``,
-  isFavorite: false,
-  offers: []
 };
 
 export default class PointController {
@@ -177,7 +163,7 @@ export default class PointController {
     const isEscKeydown = evt.key === `Esc` || evt.key === `Escape`;
     if (isEscKeydown) {
       if (this._mode === Mode.ADD) {
-        this._onDataChange(this, EmptyPoint, null);
+        this._onDataChange(this, EMPTY_POINT, null);
       }
       this._replaceAddEditToPoint();
     }

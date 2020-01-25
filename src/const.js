@@ -28,6 +28,20 @@ export const TYPE_TO_PLACEHOLDER = {
 
 export const DEFAULT_TYPE = `taxi`;
 
+export const EMPTY_POINT = {
+  type: DEFAULT_TYPE,
+  startDate: null,
+  endDate: null,
+  destination: {
+    name: ``,
+    description: ``,
+    pictures: []
+  },
+  price: ``,
+  isFavorite: false,
+  offers: []
+};
+
 export const MONTHS = [
   `Jan`,
   `Feb`,

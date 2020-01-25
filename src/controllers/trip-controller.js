@@ -1,12 +1,12 @@
 import {render, RenderPosition} from '../utils/render.js';
-import {HIDDEN_CLASS, DEFAULT_TYPE} from '../const.js';
+import {HIDDEN_CLASS, DEFAULT_TYPE, EMPTY_POINT} from '../const.js';
 
 import Board from '../components/board.js';
 import NoPoints from '../components/no-points.js';
 import TripDays from '../components/trip-days';
 import TripInfo from '../components/trip-info.js';
 import TripSort, {SortType} from '../components/trip-sort.js';
-import PointController, {Mode as PointsControllerMode, EmptyPoint} from './point-controller.js';
+import PointController, {Mode as PointsControllerMode} from './point-controller.js';
 
 const renderPoints = (pointsContainer, points, sortType, onDataChange, onViewChange, offers, destinations) => {
   pointsContainer.innerHTML = ``;
@@ -129,12 +129,12 @@ export default class TripController {
     this.render();
     const tripDaysContainer = document.querySelector(`.trip-days`);
     this._creatingPoint = new PointController(tripDaysContainer, this._onDataChange, this._onViewChange, this._pointsModel.getOffers(), this._pointsModel.getDestinations());
-    EmptyPoint.type = DEFAULT_TYPE;
-    this._creatingPoint.render(EmptyPoint, PointsControllerMode.ADD);
+    EMPTY_POINT.type = DEFAULT_TYPE;
+    this._creatingPoint.render(EMPTY_POINT, PointsControllerMode.ADD);
   }
 
   _onDataChange(pointController, oldData, newData) {
-    if (oldData === EmptyPoint) {
+    if (oldData === EMPTY_POINT) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
