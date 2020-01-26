@@ -49,12 +49,7 @@ const renderPoints = (pointsContainer, points, sortType, onDataChange, onViewCha
 const groupPointsByDate = (points) => {
   const sortedPoints = sortPointsByDate(points);
   const groupPoints = [];
-  groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[0].startDate.getDate() && element.startDate.getMonth() === sortedPoints[0].startDate.getMonth()));
-  for (let i = 1; i < sortedPoints.length; i++) {
-    if (sortedPoints[i].startDate.getDate() !== sortedPoints[i - 1].startDate.getDate() || sortedPoints[i].startDate.getMonth() !== sortedPoints[i - 1].startDate.getMonth()) {
-      groupPoints.push(sortedPoints.filter((element) => element.startDate.getDate() === sortedPoints[i].startDate.getDate() && element.startDate.getMonth() === sortedPoints[i].startDate.getMonth()));
-    }
-  }
+  Array.from(new Set(sortPointsByDate(points).map((point) => String(point.startDate.getMonth()) + String(point.startDate.getDate())))).forEach((monthDate) => groupPoints.push(sortedPoints.filter((point) => String(point.startDate.getMonth()) + String(point.startDate.getDate()) === monthDate)));
   return groupPoints;
 };
 

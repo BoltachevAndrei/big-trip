@@ -156,11 +156,7 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
       duration: points
     .filter((point) => point.type === type)
     .map((point) => (point.endDate - point.startDate))
-    });
-  }).map((element) => {
-    return ({
-      type: element.type,
-      duration: (element.duration.reduce((prev, next) => prev + next, 0))
+    .reduce((prev, next) => prev + next, 0)
     });
   });
 
