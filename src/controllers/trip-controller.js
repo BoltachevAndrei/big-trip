@@ -128,6 +128,53 @@ export default class TripController {
     this._creatingPoint.render(EMPTY_POINT, PointsControllerMode.ADD);
   }
 
+  _removePoints() {
+    this._showedPointControllers.forEach((element) => element.destroy());
+    this._showedPointControllers = [];
+  }
+
+  _removeCreatingPoint() {
+    if (this._creatingPoint) {
+      this._creatingPoint.destroy();
+      this._creatingPoint = null;
+    }
+  }
+
+  _renderPoints(points, offers, destinations) {
+    const tripDaysContainer = document.querySelector(`.trip-days`);
+    const newPoints = renderPoints(tripDaysContainer, points, this._sortType, this._onDataChange, this._onViewChange, offers, destinations);
+    this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+  }
+
+  _updatePoints() {
+    const points = this._pointsModel.getPointsWithActiveFilter();
+    const offers = this._pointsModel.getOffers();
+    const destinations = this._pointsModel.getDestinations();
+    const sortedPoints = this._sortPointsBySortType(points, this._sortType);
+
+    this._removePoints();
+    this._renderPoints(sortedPoints, offers, destinations);
+  }
+
+  _sortPointsBySortType(points, sortType) {
+    let sortedPoints = [];
+    switch (sortType) {
+      case SortType.DEFAULT:
+        sortedPoints = points.slice();
+        this._sortType = SortType.DEFAULT;
+        break;
+      case SortType.DURATION:
+        sortedPoints = points.slice().sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate));
+        this._sortType = SortType.DURATION;
+        break;
+      case SortType.PRICE:
+        sortedPoints = points.slice().sort((a, b) => b.basePrice - a.basePrice);
+        this._sortType = SortType.PRICE;
+        break;
+    }
+    return sortedPoints;
+  }
+
   _onDataChange(pointController, oldData, newData) {
     if (oldData === EMPTY_POINT) {
       this._creatingPoint = null;
@@ -193,52 +240,5 @@ export default class TripController {
   _onViewChange() {
     this._removeCreatingPoint();
     this._showedPointControllers.forEach((element) => element.setDefaultView());
-  }
-
-  _removePoints() {
-    this._showedPointControllers.forEach((element) => element.destroy());
-    this._showedPointControllers = [];
-  }
-
-  _removeCreatingPoint() {
-    if (this._creatingPoint) {
-      this._creatingPoint.destroy();
-      this._creatingPoint = null;
-    }
-  }
-
-  _renderPoints(points, offers, destinations) {
-    const tripDaysContainer = document.querySelector(`.trip-days`);
-    const newPoints = renderPoints(tripDaysContainer, points, this._sortType, this._onDataChange, this._onViewChange, offers, destinations);
-    this._showedPointControllers = this._showedPointControllers.concat(newPoints);
-  }
-
-  _updatePoints() {
-    const points = this._pointsModel.getPointsWithActiveFilter();
-    const offers = this._pointsModel.getOffers();
-    const destinations = this._pointsModel.getDestinations();
-    const sortedPoints = this._sortPointsBySortType(points, this._sortType);
-
-    this._removePoints();
-    this._renderPoints(sortedPoints, offers, destinations);
-  }
-
-  _sortPointsBySortType(points, sortType) {
-    let sortedPoints = [];
-    switch (sortType) {
-      case SortType.DEFAULT:
-        sortedPoints = points.slice();
-        this._sortType = SortType.DEFAULT;
-        break;
-      case SortType.DURATION:
-        sortedPoints = points.slice().sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate));
-        this._sortType = SortType.DURATION;
-        break;
-      case SortType.PRICE:
-        sortedPoints = points.slice().sort((a, b) => b.basePrice - a.basePrice);
-        this._sortType = SortType.PRICE;
-        break;
-    }
-    return sortedPoints;
   }
 }
