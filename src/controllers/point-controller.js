@@ -131,15 +131,15 @@ export default class PointController {
   }
 
   shake() {
-    this._addEditPointComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._pointComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._addEditPointComponent.addAnimation(`shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`);
+    this._pointComponent.addAnimation(`shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`);
     setTimeout(() => {
-      this._addEditPointComponent.getElement().style.animation = ``;
-      this._pointComponent.getElement().style.animation = ``;
+      this._addEditPointComponent.removeAnimation();
+      this._pointComponent.removeAnimation();
       this._addEditPointComponent.setData({
         saveButtonText: `Save`,
         deleteButtonText: `Delete`
-      });
+      }, []);
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 

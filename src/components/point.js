@@ -72,4 +72,12 @@ export default class Point extends AbstractComponent {
     const pointRollupButton = this.getElement().querySelector(`.event__rollup-btn`);
     pointRollupButton.addEventListener(`click`, handler);
   }
+
+  addAnimation(animation) {
+    this.getElement().style.animation = animation;
+  }
+
+  removeAnimation() {
+    this.getElement().style.animation = ``;
+  }
 }

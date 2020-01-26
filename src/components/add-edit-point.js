@@ -30,8 +30,8 @@ const createDestinationsTemplate = (destinations) => (
 );
 
 const createOffersTemplate = (point, pointOffers, offers) => {
-  const index = offers.findIndex((element) => element.type === point.type.toLowerCase());
-  const offersTemplate = index < 0 || !pointOffers ? `` : offers[index].offers.map((element) => (
+  const offersForType = offers.find((offer) => offer.type === point.type.toLowerCase());
+  const offersTemplate = offersForType.length ? `` : offersForType.offers.map((element) => (
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${element.title}-1" type="checkbox" name="event-offer-${element.title}" ${pointOffers.some((pointOffer) => pointOffer.title === element.title) ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${element.title}-1">
@@ -316,6 +316,14 @@ export default class AddEditPoint extends AbstractSmartComponent {
   setRollupButtonClickHandler(handler) {
     const pointRollupButton = this.getElement().querySelector(`.event__rollup-btn`);
     pointRollupButton.addEventListener(`click`, handler);
+  }
+
+  addAnimation(animation) {
+    this.getElement().style.animation = animation;
+  }
+
+  removeAnimation() {
+    this.getElement().style.animation = ``;
   }
 
   _applyFlatpickr() {
